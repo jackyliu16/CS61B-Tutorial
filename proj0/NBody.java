@@ -32,4 +32,31 @@ public class NBody {
         }
         return planets;
     }
+
+    public static void main(String[] args) {
+        if (args.length != 3) {
+            return ;
+        }
+        // collect information
+        double T = Double.parseDouble(args[0]);
+        double dt = Double.parseDouble(args[1]);
+        String fileName = args[2];
+
+        // get information
+        double radius = readRadius(fileName);
+        Planet[] planets = readPlanets(fileName);
+
+        // set background image
+        StdDraw.setScale(-radius, radius);
+        StdDraw.clear();
+        StdDraw.picture(0, 0, "images/starfield.jpg");
+
+        // Draw All the Planets
+        for (Planet planet : planets) {
+            StdDraw.picture(planet.xxPos, planet.yyPos, planet.imgFileName);
+        }
+
+        StdDraw.show();
+        StdDraw.pause(2000);
+    }
 }
