@@ -93,4 +93,10 @@ public class Planet {
         this.yyPos += time * this.yyVel;
     }
 
+//    public double readRadius(String str) {
+//        In in = new In(str);
+//        int number_of_plants = in.readInt();
+//        return in.readDouble();
+//    }
+
 }
