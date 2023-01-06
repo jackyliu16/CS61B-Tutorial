@@ -128,7 +128,10 @@ public class IntList {
         return res;
     }
 
-
+    public static void main(String[] args) {
+        IntList A = IntList.of(1, 2, 3, 4, 5, 6);
+        System.out.println(A);
+    }
 
 
 
