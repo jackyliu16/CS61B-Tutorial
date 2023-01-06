@@ -38,4 +38,44 @@ public class Planet {
         return Math.sqrt((planet.xxPos - this.xxPos) * (planet.xxPos - this.xxPos) + (planet.yyPos - this.yyPos) * (planet.yyPos - this.yyPos));
     }
 
+    static double G = 6.67e-11;
+    public double calcForceExertedBy(Planet planet) {
+        double r = calcDistance(planet);
+        return (G * planet.mass * this.mass) / (r * r);
+    }
+
+    public double calcForceExertedByX(Planet planet) {
+        double force = calcForceExertedBy(planet);
+        double r = calcDistance(planet);
+        return (force * (planet.xxPos - this.xxPos)) / r;
+    }
+
+    public double calcForceExertedByY(Planet planet) {
+        double force = calcForceExertedBy(planet);
+        double r = calcDistance(planet);
+        return (force * (planet.yyPos - this.yyPos)) / r;
+    }
+
+    public double calcNetForceExertedByX(Planet[] planets) {
+        double countX = 0;
+        for (Planet planet : planets) {
+            if (this.equals(planet)) {
+                continue;
+            }
+            countX += calcForceExertedByX(planet);
+        }
+        return countX;
+    }
+
+    public double calcNetForceExertedByY(Planet[] planets) {
+        double countY = 0;
+        for (Planet planet : planets) {
+            if (this.equals(planet)) {
+                continue;
+            }
+            countY += calcForceExertedByY(planet);
+        }
+        return countY;
+    }
+
 }
