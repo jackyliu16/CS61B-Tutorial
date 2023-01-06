@@ -16,5 +16,20 @@ public class NBody {
         return in.readDouble();
     }
 
-    
+    public static Planet[] readPlanets(String str) {
+        In in = new In(str);
+        int number_of_planet = in.readInt();
+        in.readDouble();
+        Planet[] planets = new Planet[number_of_planet];
+        for ( int i = 0 ; i < number_of_planet ; i++ ) {
+            double pX = in.readDouble();
+            double pY = in.readDouble();
+            double vX = in.readDouble();
+            double vY = in.readDouble();
+            double mass = in.readDouble();
+            String imgFile = in.readString();
+            planets[i] = new Planet(pX, pY, vX, vY, mass, imgFile);
+        }
+        return planets;
+    }
 }
