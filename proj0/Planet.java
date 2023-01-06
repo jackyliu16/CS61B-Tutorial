@@ -78,4 +78,19 @@ public class Planet {
         return countY;
     }
 
+    public double calcAcceleration(double force) {
+       return force / this.mass;
+    }
+
+    public void update(double time, double xForce, double yForce) {
+//        double velocityX = this.xxVel + time * calcAcceleration(xForce);
+//        double velocityY = this.yyVel + time * calcAcceleration(yForce);
+//        double positionX = this.xxPos + time * velocityX;
+//        double positionY = this.yyPos + time * velocityY;
+        this.xxVel += time * calcAcceleration(xForce);
+        this.yyVel += time * calcAcceleration(yForce);
+        this.xxPos += time * this.xxVel;
+        this.yyPos += time * this.yyVel;
+    }
+
 }
