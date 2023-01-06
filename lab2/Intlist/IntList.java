@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Formatter;
 
 /**
@@ -37,7 +38,6 @@ public class IntList {
      * Returns a list equal to L with all elements squared. Destructive.
      */
     public static void dSquareList(IntList L) {
-
         while (L != null) {
             L.first = L.first * L.first;
             L = L.rest;
@@ -81,8 +81,21 @@ public class IntList {
      */
 
     public static IntList dcatenate(IntList A, IntList B) {
-        //TODO:  fill in method
-        return null;
+        IntList p = A;
+        IntList q = B;
+        while (p.rest != null){
+            p = p.rest;
+        }
+        // append the root node
+        p.rest = new IntList(B.first, null);
+        p = p.rest;
+        // append other
+        while (q.rest != null) {
+            q = q.rest;
+            p.rest = new IntList(q.first, null);
+            p = p.rest;
+        }
+        return A;
     }
 
     /**
@@ -90,8 +103,29 @@ public class IntList {
      * * elements of B.  May NOT modify items of A.  Use 'new'.
      */
     public static IntList catenate(IntList A, IntList B) {
-        //TODO:  fill in method
-        return null;
+        ArrayList<Integer> tmp = new ArrayList<>();
+        // append a
+        tmp.add(A.first);
+        while (A.rest != null) {
+            A = A.rest;
+            tmp.add(A.first);
+        }
+        // append b
+        tmp.add(B.first);
+        while (B.rest != null) {
+            B = B.rest;
+            tmp.add(B.first);
+        }
+        // using the item from a and b to create a new IntList
+        // BC haven't a function to create a IntList from Array thus
+        IntList res = IntList.of(tmp.get(0));
+        IntList p = res;
+        for ( int i = 1 ; i < tmp.size() ; i++ ) {
+            assert p != null;
+            p.rest = new IntList(tmp.get(i), null);
+            p = p.rest;
+        }
+        return res;
     }
 
 

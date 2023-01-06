@@ -66,4 +66,14 @@ public class IntListTest {
         assertEquals(IntList.of(1, 2, 3), A);
     }
 
+    @Test
+    public void testNonDestructiveOfSquareListRecursive() {
+        IntList A = IntList.of(1, 2, 3);
+        IntList B = IntList.of(1, 2, 3);
+        IntList exp = IntList.of(1, 4, 9);
+        IntList res = IntList.squareListRecursive(A);
+        assertEquals(A, B);         // check if Non-Destruct
+        assertEquals(res, exp);     // check if full functionality
+    }
+
 }
