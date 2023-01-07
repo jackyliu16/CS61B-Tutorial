@@ -9,6 +9,8 @@
  */
 
 
+import java.util.Enumeration;
+
 public class NBody {
     public static double readRadius(String str) {
         In in = new In(str);
@@ -55,8 +57,36 @@ public class NBody {
         for (Planet planet : planets) {
             StdDraw.picture(planet.xxPos, planet.yyPos, String.format("%s%s", "images/", planet.imgFileName));
         }
+        // enable double buffering
+        StdDraw.enableDoubleBuffering();
 
-        StdDraw.show();
-        StdDraw.pause(2000);
+        for ( double t = 0; t < T; t += dt ) {
+            // create force array
+            double[] xForceArr = new double[planets.length];
+            double[] yForceArr = new double[planets.length];
+
+            // calculate the net force of each planet
+            for ( int i = 0; i < planets.length; i++ ) {
+                xForceArr[i] = planets[i].calcNetForceExertedByX(planets);
+                yForceArr[i] = planets[i].calcNetForceExertedByY(planets);
+            }
+
+            // update the location of planets
+            for ( int i = 0; i < planets.length; i++ ) {
+                planets[i].update(dt, xForceArr[i], yForceArr[i]);
+            }
+
+            // draw background image
+            StdDraw.picture(0, 0, "images/starfield.jpg");
+            for (Planet planet: planets) {
+                StdDraw.picture(planet.xxPos, planet.yyPos, String.format("%s%s", "images/", planet.imgFileName));
+            }
+
+            // show offscreen buffer
+            StdDraw.show();
+            StdDraw.pause(10);
+        }
+//        StdDraw.show();
+//        StdDraw.pause(2000);
     }
 }
