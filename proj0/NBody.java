@@ -53,7 +53,7 @@ public class NBody {
 
         // Draw All the Planets
         for (Planet planet : planets) {
-            StdDraw.picture(planet.xxPos, planet.yyPos, planet.imgFileName);
+            StdDraw.picture(planet.xxPos, planet.yyPos, String.format("%s%s", "images/", planet.imgFileName));
         }
 
         StdDraw.show();
