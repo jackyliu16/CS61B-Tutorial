@@ -38,7 +38,7 @@ public class Planet {
         return Math.sqrt((planet.xxPos - this.xxPos) * (planet.xxPos - this.xxPos) + (planet.yyPos - this.yyPos) * (planet.yyPos - this.yyPos));
     }
 
-    static double G = 6.67e-11;
+    private static double G = 6.67e-11;
     public double calcForceExertedBy(Planet planet) {
         double r = calcDistance(planet);
         return (G * planet.mass * this.mass) / (r * r);
@@ -78,8 +78,12 @@ public class Planet {
         return countY;
     }
 
-    public double calcAcceleration(double force) {
-       return force / this.mass;
+    private double calcAcceleration(double force) {
+        return force / this.mass;
+    }
+
+    public void draw() {
+        StdDraw.picture(this.xxPos, this.yyPos, String.format("%s%s", "images/", this.imgFileName));
     }
 
     public void update(double time, double xForce, double yForce) {

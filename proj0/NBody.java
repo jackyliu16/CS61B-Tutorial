@@ -1,4 +1,3 @@
-
 /*
  * @File:   NBody.java
  * @Desc:
@@ -9,8 +8,6 @@
  */
 
 
-import java.util.Enumeration;
-
 public class NBody {
     public static double readRadius(String str) {
         In in = new In(str);
@@ -20,10 +17,10 @@ public class NBody {
 
     public static Planet[] readPlanets(String str) {
         In in = new In(str);
-        int number_of_planet = in.readInt();
+        int numberOfPlanet = in.readInt();
         in.readDouble();
-        Planet[] planets = new Planet[number_of_planet];
-        for ( int i = 0 ; i < number_of_planet ; i++ ) {
+        Planet[] planets = new Planet[numberOfPlanet];
+        for ( int i = 0 ; i < numberOfPlanet ; i++ ) {
             double pX = in.readDouble();
             double pY = in.readDouble();
             double vX = in.readDouble();
@@ -79,7 +76,8 @@ public class NBody {
             // draw background image
             StdDraw.picture(0, 0, "images/starfield.jpg");
             for (Planet planet: planets) {
-                StdDraw.picture(planet.xxPos, planet.yyPos, String.format("%s%s", "images/", planet.imgFileName));
+//                StdDraw.picture(planet.xxPos, planet.yyPos, String.format("%s%s", "images/", planet.imgFileName));
+                planet.draw();
             }
 
             // show offscreen buffer
