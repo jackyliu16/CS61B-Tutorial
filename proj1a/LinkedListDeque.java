@@ -133,6 +133,10 @@ public class LinkedListDeque<T> {
         return null;
     }
 
+    public T getRecursive(int index) {
+        return head.recursiveGet(index, 0);
+    }
+
 }
 
 class Node<T> {
@@ -154,5 +158,15 @@ class Node<T> {
 
     boolean isEmpty() {
         return val == null;
+    }
+
+    T recursiveGet(int index, int cnt) {
+        if ( cnt != index && this.next != null ) {
+            return this.next.recursiveGet(index, cnt + 1);
+        }
+        else {
+            return null;
+        }
+
     }
 }

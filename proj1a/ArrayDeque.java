@@ -9,10 +9,10 @@
  */
 
 public class ArrayDeque<T> {
-    int size = 0;
-    int range = 8;
-    int left;
-    int right;
+    private int size = 0;
+    private int range = 8;
+    private int left;
+    private int right;
     Object[] data;
 
     ArrayDeque() {
@@ -114,7 +114,8 @@ public class ArrayDeque<T> {
     }
 
     public T get(int index) {
-        return null;
+        int first = (this.left + 1 + this.range) % this.range;
+        return (T) this.data[(first + index + this.range) % this.range];
     }
 
     private void shrinkSize() {
