@@ -131,7 +131,6 @@ public class ArrayDequeTest {
         lld1.printDeque();
         addStringTail(lld1, 4, 5, 6);
         lld1.printDeque();
-        System.out.print(lld1);
         System.out.println("IF SAME THUS PASS");
         System.out.println("=====================");
     }
