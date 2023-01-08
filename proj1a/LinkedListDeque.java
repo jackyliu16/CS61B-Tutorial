@@ -64,8 +64,21 @@ public class LinkedListDeque<T> {
         System.out.print("(");
         while ( node.next != null ) {
             System.out.printf("%s, ", node.val.toString());
+            node = node.next;
         }
         System.out.printf("%s)\n", node.val.toString());
+    }
+
+    public String toString() {
+        StringBuilder res = new StringBuilder(new String());
+        Node<T> node = this.head;
+        res.append("[");
+        while ( node.next != null ) {
+            res.append(String.format("%s, ", node.val.toString()));
+            node = node.next;
+        }
+        res.append(String.format("%s]\n", node.val.toString()));
+        return res.toString();
     }
 
     public T removeFirst() {
@@ -119,6 +132,7 @@ public class LinkedListDeque<T> {
         }
         return null;
     }
+
 }
 
 class Node<T> {
