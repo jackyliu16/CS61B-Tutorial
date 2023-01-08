@@ -13,9 +13,9 @@ public class ArrayDeque<T> {
     private int range = 8;
     private int left;
     private int right;
-    Object[] data;
+    private Object[] data;
 
-    ArrayDeque() {
+    public ArrayDeque() {
         this.left = range / 2 - 1;
         this.right = range / 2;
         data = new Object[range];

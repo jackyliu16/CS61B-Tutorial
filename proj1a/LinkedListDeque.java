@@ -9,10 +9,10 @@
  */
 
 public class LinkedListDeque<T> {
-    Node<T> head;
-    Node<T> tail;
+    private Node<T> head;
+    private Node<T> tail;
 
-    LinkedListDeque() {
+    public LinkedListDeque() {
         Node<T> tmp = new Node<>();
         head = tmp;
         tail = tmp;
@@ -70,17 +70,17 @@ public class LinkedListDeque<T> {
         System.out.printf("%s)\n", node.val.toString());
     }
 
-    public String toString() {
-        StringBuilder res = new StringBuilder(new String());
-        Node<T> node = this.head;
-        res.append("[");
-        while (node.next != null) {
-            res.append(String.format("%s, ", node.val.toString()));
-            node = node.next;
-        }
-        res.append(String.format("%s]\n", node.val.toString()));
-        return res.toString();
-    }
+//    public String toString() {
+//        StringBuilder res = new StringBuilder(new String());
+//        Node<T> node = this.head;
+//        res.append("[");
+//        while (node.next != null) {
+//            res.append(String.format("%s, ", node.val.toString()));
+//            node = node.next;
+//        }
+//        res.append(String.format("%s]\n", node.val.toString()));
+//        return res.toString();
+//    }
 
     public T removeFirst() {
         T res;
