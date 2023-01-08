@@ -12,7 +12,7 @@ public class LinkedListDeque<T> {
     Node<T> head;
     Node<T> tail;
 
-    LinkedListDeque () {
+    LinkedListDeque() {
         Node<T> tmp = new Node<>();
         head = tmp;
         tail = tmp;
@@ -20,7 +20,7 @@ public class LinkedListDeque<T> {
 
     public void addFirst(T item) {
         Node<T> node = new Node<>(item);
-        if ( head.isEmpty() ) {
+        if (head.isEmpty()) {
             head = node;
             tail = node;
         } else {
@@ -29,9 +29,10 @@ public class LinkedListDeque<T> {
             head = node;
         }
     }
+
     public void addLast(T item) {
         Node<T> node = new Node<>(item);
-        if ( tail.isEmpty() ) {
+        if (tail.isEmpty()) {
             head = node;
             tail = node;
         } else {
@@ -52,7 +53,7 @@ public class LinkedListDeque<T> {
         int cnt = 0;
         Node<T> node = this.head;
         // if have next
-        while ( node.next != null ) {
+        while (node.next != null) {
             cnt += 1;
             node = node.next;
         }
@@ -62,7 +63,7 @@ public class LinkedListDeque<T> {
     public void printDeque() {
         Node<T> node = this.head;
         System.out.print("(");
-        while ( node.next != null ) {
+        while (node.next != null) {
             System.out.printf("%s, ", node.val.toString());
             node = node.next;
         }
@@ -73,7 +74,7 @@ public class LinkedListDeque<T> {
         StringBuilder res = new StringBuilder(new String());
         Node<T> node = this.head;
         res.append("[");
-        while ( node.next != null ) {
+        while (node.next != null) {
             res.append(String.format("%s, ", node.val.toString()));
             node = node.next;
         }
@@ -102,14 +103,13 @@ public class LinkedListDeque<T> {
 
     public T removeLast() {
         T res;
-        if ( tail.prev != null ) {
+        if (tail.prev != null) {
             Node<T> node = tail.prev;
             tail.prev = null;
             node.next = null;
             res = tail.val;
             tail = node;
-        }
-        else {
+        } else {
             assert head != tail;
             res = tail.val;
             tail.val = null;
@@ -140,19 +140,19 @@ class Node<T> {
     Node<T> prev;
     Node<T> next;
 
-    boolean isEmpty() {
-        return val == null;
-    }
-
-    Node () {
+    Node() {
         this.val = null;
         this.prev = null;
         this.next = null;
     }
 
-    Node (T val) {
+    Node(T val) {
         this.val = val;
         this.prev = null;
         this.next = null;
+    }
+
+    boolean isEmpty() {
+        return val == null;
     }
 }

@@ -8,8 +8,6 @@
  * @Version:0.0
  */
 
-import java.util.Arrays;
-
 public class ArrayDeque<T> {
     int size = 0;
     int range = 8;
@@ -41,7 +39,7 @@ public class ArrayDeque<T> {
     public void addFirst(T item) {
         // account the size and analyzer if need to expand
         this.size += 1;
-        if ( this.range * 0.75 < this.size ) {
+        if (this.range * 0.75 < this.size) {
             expandSize();
         }
 
@@ -53,8 +51,8 @@ public class ArrayDeque<T> {
 
     public void addLast(T item) {
         this.size += 1;
-        if ( this.range * 0.75 < this.size ) {
-             expandSize();
+        if (this.range * 0.75 < this.size) {
+            expandSize();
         }
 
         assert this.data[this.right] != null;
@@ -64,11 +62,11 @@ public class ArrayDeque<T> {
 
     public void printDeque() {
         // BC may have the situation that right pointer at the left of the left pointer
-        if ( isEmpty() ) {
+        if (isEmpty()) {
             System.out.println("(null)");
         }
         System.out.print("(");
-        for ( int i = this.left; i != this.right; i = (i + 1 + this.range) % this.range ) {
+        for (int i = this.left; i != this.right; i = (i + 1 + this.range) % this.range) {
             if (this.data[i] == null) {
                 continue;
             }
@@ -77,14 +75,19 @@ public class ArrayDeque<T> {
         System.out.print(")\n");
     }
 
-    public boolean isEmpty() { return size == 0; }
-    public int size() { return this.size; }
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    public int size() {
+        return this.size;
+    }
 
     // TODO maybe have problem when we move the item (size and item wasn't match)
     public T removeFirst() {
         // first check if the size match the limit of shrink
         this.size -= 1;
-        if ( this.range * 0.25 > this.size ) {
+        if (this.range * 0.25 > this.size) {
             shrinkSize();
         }
 
@@ -98,7 +101,7 @@ public class ArrayDeque<T> {
 
     public T removeLast() {
         this.size -= 1;
-        if ( this.range >= 16 && this.range * 0.25 > this.size ) {
+        if (this.range >= 16 && this.range * 0.25 > this.size) {
             shrinkSize();
         }
 
@@ -110,7 +113,9 @@ public class ArrayDeque<T> {
         return res;
     }
 
-    public T get(int index) { return null; }
+    public T get(int index) {
+        return null;
+    }
 
     private void shrinkSize() {
         assert this.range * 0.25 < size && this.range >= 16;
@@ -118,7 +123,7 @@ public class ArrayDeque<T> {
         Object[] newArr = new Object[nextRange];
         int cnt = 0;
         // copy the array
-        for ( int i = this.left + 1; i != this.right; i = ( i + 1 + this.range ) % this.range ) {
+        for (int i = this.left + 1; i != this.right; i = (i + 1 + this.range) % this.range) {
             newArr[cnt] = this.data[i];
             cnt += 1;
         }
@@ -126,7 +131,7 @@ public class ArrayDeque<T> {
         this.range = nextRange;
         // BC the range of array is resize from 0
         this.left = this.range;
-        this.left = ( - 1 + this.range ) % this.range;  // the last one
+        this.left = (-1 + this.range) % this.range;  // the last one
         this.right = this.size + 1;                     // BC have one haven't been sub
     }
 
@@ -136,8 +141,8 @@ public class ArrayDeque<T> {
         Object[] newArr = new Object[nextRange];
 //        Arrays.copyOf(this.data, int l)
         int cnt = 0;
-        for ( int i = this.left; i != this.right; i = ( i + 1 + this.range ) % this.range ) {
-            if ( this.data[i] == null ) {
+        for (int i = this.left; i != this.right; i = (i + 1 + this.range) % this.range) {
+            if (this.data[i] == null) {
                 continue;   // BC when the left and right between each other have problem
             }
             newArr[cnt] = this.data[i];
@@ -145,7 +150,7 @@ public class ArrayDeque<T> {
         }
         this.data = newArr;
         this.range = nextRange;
-        this.left = ( - 1 + this.range ) % this.range;
+        this.left = (-1 + this.range) % this.range;
         this.right = this.size - 1; // BC have a item haven't been insert
     }
 }

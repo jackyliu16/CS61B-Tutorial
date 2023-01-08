@@ -10,32 +10,33 @@
 
 public class ArrayDequeTest {
     // ArrayDeque
-    public static void addStringHead(ArrayDeque<Integer> deque, int...data) {
-        for ( int item : data ) {
+    public static void addStringHead(ArrayDeque<Integer> deque, int... data) {
+        for (int item : data) {
             deque.addFirst(item);
         }
     }
 
-    public static void addStringTail(ArrayDeque<Integer> deque, int...data) {
-        for ( int item : data ) {
+    public static void addStringTail(ArrayDeque<Integer> deque, int... data) {
+        for (int item : data) {
             deque.addLast(item);
         }
     }
 
-    public static void addStringHead(ArrayDeque<String> deque, String...data) {
-        for ( String str : data ) {
+    public static void addStringHead(ArrayDeque<String> deque, String... data) {
+        for (String str : data) {
             deque.addFirst(str);
         }
     }
 
-    public static void addStringTail(ArrayDeque<String> deque, String...data) {
-        for ( String str : data ) {
+    public static void addStringTail(ArrayDeque<String> deque, String... data) {
+        for (String str : data) {
             deque.addLast(str);
         }
     }
+
     public static String popFromHead(ArrayDeque<?> deque, int num) {
         StringBuilder sb = new StringBuilder("POP: (");
-        for ( int i = 0; i < num - 1; i++ ) {
+        for (int i = 0; i < num - 1; i++) {
             sb.append(String.format("%s, ", deque.removeFirst().toString()));
         }
         sb.append(String.format("%s)", deque.removeFirst().toString()));
@@ -45,7 +46,7 @@ public class ArrayDequeTest {
 
     public static String popFromTail(ArrayDeque<?> deque, int num) {
         StringBuilder sb = new StringBuilder("POP: (");
-        for ( int i = 0; i < num - 1; i++ ) {
+        for (int i = 0; i < num - 1; i++) {
             sb.append(String.format("%s, ", deque.removeLast().toString()));
         }
         sb.append(String.format("%s)", deque.removeLast().toString()));
@@ -83,24 +84,26 @@ public class ArrayDequeTest {
         System.out.println("====================");
     }
 
-    /** Adds a few things to the list, checking isEmpty() and size() are correct,
+    /**
+     * Adds a few things to the list, checking isEmpty() and size() are correct,
      * finally printing the results.
-     *
-     * && is the "and" operation. */
+     * <p>
+     * && is the "and" operation.
+     */
     public static void addIsEmptySizeTest() {
 //		LinkedListDeque<String> lld1 = new LinkedListDeque<>();
         ArrayDeque<String> lld1 = new ArrayDeque();
         boolean passed = checkEmpty(true, lld1.isEmpty());
         lld1.addFirst("front");
-        passed = checkSize(1, lld1.size()) 		&& passed;
+        passed = checkSize(1, lld1.size()) && passed;
         passed = checkEmpty(false, lld1.isEmpty()) && passed;
 
         lld1.addLast("middle");
-        passed = checkSize(2, lld1.size())			&& passed;
+        passed = checkSize(2, lld1.size()) && passed;
         passed = checkEmpty(false, lld1.isEmpty()) && passed;
 
         lld1.addLast("back");
-        passed = checkSize(3, lld1.size()) 		&& passed;
+        passed = checkSize(3, lld1.size()) && passed;
 
         System.out.println("Printing out deque: ");
         lld1.printDeque();
@@ -108,7 +111,9 @@ public class ArrayDequeTest {
         printTestStatus(passed);
     }
 
-    /** Adds an item, then removes an item, and ensures that dll is empty afterwards. */
+    /**
+     * Adds an item, then removes an item, and ensures that dll is empty afterwards.
+     */
     public static void addRemoveTest() {
         ArrayDeque<Integer> lld1 = new ArrayDeque<>();
         // should be empty
