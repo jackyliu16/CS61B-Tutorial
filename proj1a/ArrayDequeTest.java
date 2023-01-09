@@ -203,7 +203,7 @@ public class ArrayDequeTest {
         System.out.println(aq.removeFirst());
         System.out.println(aq.removeLast());
         boolean flag = checkEmpty(true, aq.isEmpty());
-        flag = checkSize(0, aq.size()) && flag ;
+        flag = checkSize(0, aq.size()) && flag;
         printTestStatus(flag);
     }
 
@@ -231,6 +231,7 @@ public class ArrayDequeTest {
         System.out.println(aq.removeLast());
         System.out.println(aq.removeFirst());
     }
+
     public static void main(String[] args) {
         // NOTE if want to open the assert that should add --enableassertions in the vm options
         System.out.println("Running tests.\n");

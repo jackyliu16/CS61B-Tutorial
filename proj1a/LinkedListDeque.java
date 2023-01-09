@@ -165,15 +165,13 @@ class Node<T> {
     }
 
     T recursiveGet(int index, int cnt) {
-        if ( cnt != index && this.next != null ) {
+        if (cnt != index && this.next != null) {
             // if have next to past
             return this.next.recursiveGet(index, cnt + 1);
-        }
-        else {
+        } else {
             if (cnt == index) {
                 return this.val;
-            }
-            else {
+            } else {
                 return null;
             }
         }

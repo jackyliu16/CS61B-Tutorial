@@ -201,6 +201,7 @@ public class LinkedListDequeTest {
         passed = checkSize(0, lld.getRecursive(0)) && passed;
         printTestStatus(passed);
     }
+
     public static void main(String[] args) {
         System.out.println("Running tests.\n");
         System.out.println("=====================");

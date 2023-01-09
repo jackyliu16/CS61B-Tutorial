@@ -19,7 +19,7 @@ public class ArrayDeque<T> {
     public ArrayDeque() {
         this.capacity = INIT_CAPACITY;
         this.left = this.capacity / 2 - 1;  // 3
-        this.right= this.capacity / 2;  // 4
+        this.right = this.capacity / 2;  // 4
         this.size = 0;
         this.data = (T[]) new Object[this.capacity];
     }
