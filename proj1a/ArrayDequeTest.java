@@ -37,9 +37,9 @@ public class ArrayDequeTest {
     public static String popFromHead(ArrayDeque<?> deque, int num) {
         StringBuilder sb = new StringBuilder("POP: (");
         for (int i = 0; i < num - 1; i++) {
-            sb.append(String.format("%s, ", deque.removeFirst().toString()));
+            sb.append(String.format("%s, ", deque.removeFirst()));
         }
-        sb.append(String.format("%s)", deque.removeFirst().toString()));
+        sb.append(String.format("%s)", deque.removeFirst()));
         System.out.println(sb);
         return sb.toString();
     }
@@ -122,6 +122,15 @@ public class ArrayDequeTest {
         lld1.addFirst(10);
         // should not be empty
         passed = checkEmpty(false, lld1.isEmpty()) && passed;
+        passed = checkSize(10, lld1.get(0)) && passed;
+
+        lld1.addFirst(12);
+        passed = checkEmpty(false, lld1.isEmpty()) && passed;
+        passed = checkSize(2, lld1.size()) && passed;
+
+        passed = checkSize(10, lld1.removeLast()) && passed;
+        passed = checkSize(1, lld1.size()) && passed;
+        passed = checkEmpty(false, lld1.isEmpty()) && passed;
 
         lld1.removeFirst();
         // should be empty
@@ -132,10 +141,24 @@ public class ArrayDequeTest {
 
     public static void enhancedAddTest() {
         ArrayDeque<Integer> lld1 = new ArrayDeque<>();
-        addStringHead(lld1, 1, 2, 3);
+        addStringHead(lld1, 1, 2, 3, 42, 64, 86, 24, 36);
         lld1.printDeque();
+        lld1.size();
         addStringTail(lld1, 4, 5, 6);
         lld1.printDeque();
+        lld1.size();
+        popFromHead(lld1, 4);
+        lld1.size();
+        popFromTail(lld1, 4);
+        lld1.size();
+        System.out.println(lld1.size());
+        lld1.size();
+        popFromTail(lld1, 2);
+        lld1.size();
+        popFromHead(lld1, 1);
+        lld1.size();
+        popFromHead(lld1, 1);
+        lld1.size();
         System.out.println("IF SAME THUS PASS");
         System.out.println("=====================");
     }
@@ -154,12 +177,45 @@ public class ArrayDequeTest {
         System.out.println("=====================");
     }
 
+    public static void errorReproduction() {
+        ArrayDeque<Integer> ad = new ArrayDeque<>();
+
+        boolean passed = checkEmpty(true, ad.isEmpty());
+        ad.addFirst(1);
+
+        passed = checkSize(1, ad.size()) && passed;
+        passed = checkSize(1, ad.get(0)) && passed;
+
+
+        passed = checkSize(1, ad.removeFirst())&& passed;
+        passed = checkEmpty(true, ad.isEmpty())&& passed;
+        passed = checkEmpty(true, ad.isEmpty())&& passed;
+        passed = checkEmpty(true, ad.isEmpty())&& passed;
+
+        ad.addFirst(6);
+        passed = checkSize(1, ad.size()) && passed;
+        passed = checkEmpty(false, ad.isEmpty()) & passed;
+        ad.removeFirst();
+
+        passed = checkEmpty(true, ad.isEmpty()) & passed;
+        passed = checkSize(0, ad.size()) && passed;
+//        passed = && passed;
+//        passed = && passed;
+    }
+
+    public static void emptyPop() {
+        ArrayDeque<Integer> aq = new ArrayDeque<>();
+        System.out.println(aq.removeFirst());
+    }
+
     public static void main(String[] args) {
+        // NOTE if want to open the assert that should add --enableassertions in the vm options
         System.out.println("Running tests.\n");
         System.out.println("=====================");
         addIsEmptySizeTest();
         addRemoveTest();
         enhancedAddTest();
         enhancedDeleteTest();
+        emptyPop();
     }
 }

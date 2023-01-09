@@ -9,53 +9,49 @@
  */
 
 public class ArrayDeque<T> {
-    private int size = 0;
-    private int range = 8;
+    private static final int INIT_CAPACITY = 8;
+    private int size;
+    private int capacity;
     private int left;
     private int right;
-    private Object[] data;
+    private T[] data;
 
     public ArrayDeque() {
-        this.left = range / 2 - 1;
-        this.right = range / 2;
-        data = new Object[range];
-    }
-
-    ArrayDeque(int size) {
-        this.range = size;
-        this.left = range / 2 - 1;
-        this.right = range / 2;
-        data = new Object[range];
+        this.capacity = INIT_CAPACITY;
+        this.left = this.capacity / 2 - 1;  // 3
+        this.right= this.capacity / 2;  // 4
+        this.size = 0;
+        this.data = (T[]) new Object[this.capacity];
     }
 
     private void moveRight(int num) {
-        this.right = (this.right + num + this.range) % this.range;
+        this.right = (this.right + num + this.capacity) % this.capacity;
     }
 
     private void moveLeft(int num) {
-        this.left = (this.left + num + this.range) % this.range;
+        this.left = (this.left + num + this.capacity) % this.capacity;
     }
 
     public void addFirst(T item) {
-        // account the size and analyzer if need to expand
+        // account the size and analyzer if you need to expand
         this.size += 1;
-        if (this.range * 0.75 < this.size) {
+        if (this.capacity * 0.75 < this.size) {
             expandSize();
         }
 
         // BC the left pointing to the next item
-        assert this.data[this.left] != null;
+        assert this.data[this.left] == null;    // easy for debug
         this.data[this.left] = item;
         moveLeft(-1);
     }
 
     public void addLast(T item) {
         this.size += 1;
-        if (this.range * 0.75 < this.size) {
+        if (this.capacity * 0.75 < this.size) {
             expandSize();
         }
 
-        assert this.data[this.right] != null;
+        assert this.data[this.right] == null;
         this.data[this.right] = item;
         moveRight(1);
     }
@@ -66,7 +62,7 @@ public class ArrayDeque<T> {
             System.out.println("(null)");
         }
         System.out.print("(");
-        for (int i = this.left; i != this.right; i = (i + 1 + this.range) % this.range) {
+        for (int i = this.left; i != this.right; i = (i + 1 + this.capacity) % this.capacity) {
             if (this.data[i] == null) {
                 continue;
             }
@@ -80,69 +76,79 @@ public class ArrayDeque<T> {
     }
 
     public int size() {
+//        System.out.printf("this.capacity: %d\n", this.capacity);
         return this.size;
     }
 
     // TODO maybe have problem when we move the item (size and item wasn't match)
     public T removeFirst() {
+        if (isEmpty()) {
+            return null;
+        }
         // first check if the size match the limit of shrink
         this.size -= 1;
-        if (this.range * 0.25 > this.size) {
+        if (this.capacity >= 16 && this.capacity * 0.25 > this.size) {
             shrinkSize();
         }
 
         assert this.data[this.left] == null;
-        int tmp = (this.left + 1 + this.range) % this.range;
-        T res = (T) this.data[tmp];
+        int tmp = (this.left + 1 + this.capacity) % this.capacity;
+        assert this.data[tmp] != null;  // when size == 0 -> panic
+        T res = this.data[tmp];
         this.data[tmp] = null;
         moveLeft(1);
         return res;
     }
 
     public T removeLast() {
+        if (isEmpty()) {
+            return null;
+        }
         this.size -= 1;
-        if (this.range >= 16 && this.range * 0.25 > this.size) {
+        if (this.capacity >= 16 && this.capacity * 0.25 > this.size) {
             shrinkSize();
         }
 
         assert this.data[this.right] == null;
-        int tmp = (this.right - 1 + this.range) % this.range;
-        T res = (T) this.data[tmp];
+        int tmp = (this.right - 1 + this.capacity) % this.capacity;
+        T res = this.data[tmp];
+        assert this.data[tmp] != null;
         this.data[tmp] = null;
         moveRight(-1);
         return res;
     }
 
     public T get(int index) {
-        int first = (this.left + 1 + this.range) % this.range;
-        return (T) this.data[(first + index + this.range) % this.range];
+        int first = (this.left + 1 + this.capacity) % this.capacity;
+        return this.data[(first + index + this.capacity) % this.capacity];
     }
 
     private void shrinkSize() {
-        assert this.range * 0.25 < size && this.range >= 16;
-        int nextRange = this.range / 2;
-        Object[] newArr = new Object[nextRange];
+        assert this.capacity * 0.25 > size && this.capacity >= 16;
+        int nextRange = this.capacity / 2;
+//        Object[] newArr = new Object[nextRange];
+        T[] newArr = (T[]) new Object[nextRange];
         int cnt = 0;
         // copy the array
-        for (int i = this.left + 1; i != this.right; i = (i + 1 + this.range) % this.range) {
+        for (int i = this.left + 1; i != this.right; i = (i + 1 + this.capacity) % this.capacity) {
             newArr[cnt] = this.data[i];
             cnt += 1;
         }
         this.data = newArr;
-        this.range = nextRange;
+        this.capacity = nextRange;
         // BC the range of array is resize from 0
-        this.left = this.range;
-        this.left = (-1 + this.range) % this.range;  // the last one
+        this.left = this.capacity;
+        this.left = (-1 + this.capacity) % this.capacity;  // the last one
         this.right = this.size + 1;                     // BC have one haven't been sub
     }
 
     private void expandSize() {
-        assert this.range * 0.75 < size;
-        int nextRange = this.range * 2;
-        Object[] newArr = new Object[nextRange];
+        assert this.capacity * 0.75 < size;
+        int nextRange = this.capacity * 2;
+        T[] newArr = (T[]) new Object[nextRange];
 //        Arrays.copyOf(this.data, int l)
         int cnt = 0;
-        for (int i = this.left; i != this.right; i = (i + 1 + this.range) % this.range) {
+        for (int i = this.left; i != this.right; i = (i + 1 + this.capacity) % this.capacity) {
             if (this.data[i] == null) {
                 continue;   // BC when the left and right between each other have problem
             }
@@ -150,8 +156,8 @@ public class ArrayDeque<T> {
             cnt += 1;
         }
         this.data = newArr;
-        this.range = nextRange;
-        this.left = (-1 + this.range) % this.range;
+        this.capacity = nextRange;
+        this.left = (-1 + this.capacity) % this.capacity;
         this.right = this.size - 1; // BC have a item haven't been insert
     }
 }
