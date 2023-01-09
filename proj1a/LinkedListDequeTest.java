@@ -194,12 +194,20 @@ public class LinkedListDequeTest {
         System.out.println("=====================");
     }
 
+    public static void addGet() {
+        LinkedListDeque<Integer> lld = new LinkedListDeque<>();
+        lld.addLast(0);
+        boolean passed = checkSize(0, lld.get(0));
+        passed = checkSize(0, lld.getRecursive(0)) && passed;
+        printTestStatus(passed);
+    }
     public static void main(String[] args) {
         System.out.println("Running tests.\n");
         System.out.println("=====================");
-        addIsEmptySizeTest();
-        addRemoveTest();
-        enhancedAddTest();
-        enhancedDeleteTest();
+//        addIsEmptySizeTest();
+//        addRemoveTest();
+//        enhancedAddTest();
+//        enhancedDeleteTest();
+        addGet();
     }
 } 

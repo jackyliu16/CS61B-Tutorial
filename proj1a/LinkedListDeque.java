@@ -117,6 +117,7 @@ public class LinkedListDeque<T> {
         return res;
     }
 
+    // BUG FIX: miss the part when
     public T get(int index) {
         if (isEmpty() || index > size()) {
             return null;
@@ -129,6 +130,9 @@ public class LinkedListDeque<T> {
             }
             cnt += 1;
             node = node.next;
+        }
+        if (cnt == index) { // if 0
+            return node.val;
         }
         return null;
     }
@@ -162,10 +166,16 @@ class Node<T> {
 
     T recursiveGet(int index, int cnt) {
         if ( cnt != index && this.next != null ) {
+            // if have next to past
             return this.next.recursiveGet(index, cnt + 1);
         }
         else {
-            return null;
+            if (cnt == index) {
+                return this.val;
+            }
+            else {
+                return null;
+            }
         }
 
     }
