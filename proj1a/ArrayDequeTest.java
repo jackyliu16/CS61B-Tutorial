@@ -179,35 +179,58 @@ public class ArrayDequeTest {
 
     public static void errorReproduction() {
         ArrayDeque<Integer> ad = new ArrayDeque<>();
-
-        boolean passed = checkEmpty(true, ad.isEmpty());
-        ad.addFirst(1);
-
-        passed = checkSize(1, ad.size()) && passed;
-        passed = checkSize(1, ad.get(0)) && passed;
-
-
-        passed = checkSize(1, ad.removeFirst())&& passed;
-        passed = checkEmpty(true, ad.isEmpty())&& passed;
-        passed = checkEmpty(true, ad.isEmpty())&& passed;
-        passed = checkEmpty(true, ad.isEmpty())&& passed;
-
-        ad.addFirst(6);
-        passed = checkSize(1, ad.size()) && passed;
-        passed = checkEmpty(false, ad.isEmpty()) & passed;
-        ad.removeFirst();
-
-        passed = checkEmpty(true, ad.isEmpty()) & passed;
-        passed = checkSize(0, ad.size()) && passed;
-//        passed = && passed;
-//        passed = && passed;
+        ad.addLast(0);
+        ad.addLast(1);
+        System.out.println(ad.removeFirst());
+        System.out.println(ad.get(0));
+        System.out.println(ad.removeLast());
+        ad.addLast(5);
+        System.out.println(ad.get(0));
+        ad.addLast(7);
+        System.out.println(ad.removeFirst());
+        System.out.println(ad.removeFirst());
+        ad.addLast(10);
+        ad.addLast(11);
+        ad.addLast(12);
+        System.out.println(ad.removeLast());
+        System.out.println(ad.removeFirst());
     }
 
     public static void emptyPop() {
+        System.out.println("=====================");
         ArrayDeque<Integer> aq = new ArrayDeque<>();
         System.out.println(aq.removeFirst());
+        System.out.println(aq.removeFirst());
+        System.out.println(aq.removeLast());
+        boolean flag = checkEmpty(true, aq.isEmpty());
+        flag = checkSize(0, aq.size()) && flag ;
+        printTestStatus(flag);
     }
 
+    public static void errorReproduction2() {
+        ArrayDeque<Integer> aq = new ArrayDeque<>();
+        aq.addFirst(0);
+        aq.addFirst(1);
+        aq.addFirst(2);
+        System.out.println(aq.get(2));
+        System.out.println(aq.removeFirst());
+        aq.addLast(5);
+        System.out.println(aq.removeFirst());
+        aq.addFirst(7);
+        System.out.println(aq.get(1));
+        System.out.println(aq.removeLast());
+        System.out.println(aq.get(1));
+        aq.addFirst(11);
+        aq.addFirst(12);
+        aq.addFirst(13);
+        aq.addLast(14);
+        System.out.println(aq.get(4));
+        aq.addLast(16);
+        System.out.println(aq.removeLast());
+        System.out.println(aq.removeLast());
+        System.out.println(aq.removeLast());
+        System.out.println(aq.removeFirst());
+    }
     public static void main(String[] args) {
         // NOTE if want to open the assert that should add --enableassertions in the vm options
         System.out.println("Running tests.\n");
@@ -216,6 +239,9 @@ public class ArrayDequeTest {
         addRemoveTest();
         enhancedAddTest();
         enhancedDeleteTest();
+        emptyPop();
+        errorReproduction();
+        errorReproduction2();
         emptyPop();
     }
 }

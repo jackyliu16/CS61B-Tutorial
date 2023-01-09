@@ -130,7 +130,7 @@ public class ArrayDeque<T> {
         T[] newArr = (T[]) new Object[nextRange];
         int cnt = 0;
         // copy the array
-        for (int i = this.left + 1; i != this.right; i = (i + 1 + this.capacity) % this.capacity) {
+        for (int i = (left + 1 + capacity) % capacity; i != this.right; i = (i + 1 + this.capacity) % this.capacity) {
             newArr[cnt] = this.data[i];
             cnt += 1;
         }
