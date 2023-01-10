@@ -287,4 +287,7 @@ public class StudentArrayDeque<T> {
             return z;
         }
     }
+
+    public void addFrist(T item) {
+    }
 }
