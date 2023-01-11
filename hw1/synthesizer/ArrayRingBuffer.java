@@ -25,7 +25,7 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> implements Bound
         this.fillCount = 0;
         this.capacity = capacity;
         this.rb = (T[]) new Object[capacity];
-        Arrays.fill(this.rb, 0);
+//        Arrays.fill(this.rb, 0);
     }
 
     /**
@@ -40,6 +40,7 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> implements Bound
         this.fillCount += 1;
         // if now last wasn't empty then will not enqueue
         if (this.rb[this.last] != null) {
+            // if the place have been use
             return;
         } else {
             this.rb[this.last] = x;
