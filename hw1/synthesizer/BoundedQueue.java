@@ -8,7 +8,10 @@ package synthesizer;
  * @Version:0.0
  */
 
-public interface BoundedQueue<T> {
+import java.util.Iterator;
+import java.util.function.Consumer;
+
+public interface BoundedQueue<T> extends Iterable<T> {
     int capacity();     // return size of the buffer
     int fillCount();    // return number of items currently in the buffer
     void enqueue(T x);  // add item x to the end

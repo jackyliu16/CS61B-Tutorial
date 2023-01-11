@@ -2,9 +2,13 @@ package synthesizer;// TODO: Make sure to make this class a part of the synthesi
 // package <package name>;
 import synthesizer.AbstractBoundedQueue;
 
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+
 //TODO: Make sure to make this class and all of its methods public
 //TODO: Make sure to make this class extend AbstractBoundedQueue<t>
-public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
+public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> implements BoundedQueue<T> {
     /* Index for the next dequeue or peek. */
     private int first;            // index for the next dequeue or peek
     /* Index for the next enqueue. */
@@ -82,5 +86,43 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
             sb.append(String.format("%s, ", this.rb[i].toString()));
         }
         return sb.toString() + ")";
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new ArrayRingBufferIter();
+    }
+
+    @Override
+    public void forEach(Consumer<? super T> action) {
+        BoundedQueue.super.forEach(action);
+    }
+
+    @Override
+    public Spliterator<T> spliterator() {
+        return BoundedQueue.super.spliterator();
+    }
+
+    private class ArrayRingBufferIter implements Iterator<T> {
+        private int pos;
+        private int curNum;
+
+        public ArrayRingBufferIter() {
+            pos = first;
+            curNum = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return curNum < fillCount;
+        }
+
+        @Override
+        public T next() {
+            T res = rb[pos];
+            pos = (pos + 1 + capacity) % capacity;
+            curNum++;
+            return res;
+        }
     }
 }

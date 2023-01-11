@@ -1,5 +1,7 @@
-// TODO: Make sure to make this class a part of the synthesizer package
+package synthesizer;// TODO: Make sure to make this class a part of the synthesizer package
 //package <package name>;
+
+import java.util.ArrayList;
 
 //Make sure this class is public
 public class GuitarString {
@@ -18,6 +20,7 @@ public class GuitarString {
         //       cast the result of this divsion operation into an int. For better
         //       accuracy, use the Math.round() function before casting.
         //       Your buffer should be initially filled with zeros.
+        this.buffer = new ArrayRingBuffer<Double>((int) Math.round(SR / frequency));
     }
 
 
@@ -28,6 +31,31 @@ public class GuitarString {
         //       double r = Math.random() - 0.5;
         //
         //       Make sure that your random numbers are different from each other.
+        ArrayList<Double> save = new ArrayList<>();
+        // create the double and make sure there haven't same inside.
+        for (int i = 0; i < buffer.capacity(); i++) {
+            double r;
+            do {
+                r = Math.random() - 0.5;
+            } while (save.contains(r));
+            save.add(r);
+        }
+
+        // first deque until throw RunTimeException
+        try {
+            for (int i = 0; i < buffer.fillCount(); i++) {
+                buffer.dequeue();
+            }
+        } catch (RuntimeException e) {
+            // do nothing
+        }
+
+        // now all item will be remove;
+        assert buffer.isEmpty();
+
+        for (double item: save) {
+            buffer.enqueue(item);
+        }
     }
 
     /* Advance the simulation one time step by performing one iteration of
