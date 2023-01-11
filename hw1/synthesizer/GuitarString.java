@@ -33,8 +33,9 @@ public class GuitarString {
         //       double r = Math.random() - 0.5;
         //
         //       Make sure that your random numbers are different from each other.
-        ArrayList<Double> save = new ArrayList<>();
+
         // create the double and make sure there haven't same inside.
+        ArrayList<Double> save = new ArrayList<>();
         for (int i = 0; i < buffer.capacity(); i++) {
             double r;
             do {
@@ -45,10 +46,12 @@ public class GuitarString {
 
         // first deque until throw RunTimeException
         try {
+            // remove all items
             for (int i = 0; i < buffer.fillCount(); i++) {
                 buffer.dequeue();
             }
         } catch (RuntimeException e) {
+            System.out.println("RunTimeException: buffer deque forgot");
             // do nothing
         }
 
@@ -67,11 +70,16 @@ public class GuitarString {
         // TODO: Dequeue the front sample and enqueue a new sample that is
         //       the average of the two multiplied by the DECAY factor.
         //       Do not call StdAudio.play().
+        for (int i = 0; i < buffer.fillCount(); i++ ) {
+            // one loop
+            double item = buffer.dequeue();
+            double peek = buffer.peek();
+            buffer.enqueue((DECAY * (item + peek)) / 2);
+        }
     }
 
     /* Return the double at the front of the buffer. */
     public double sample() {
-        // TODO: Return the correct thing.
-        return 0;
+        return buffer.peek();
     }
 }

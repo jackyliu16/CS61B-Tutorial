@@ -2,6 +2,7 @@ package synthesizer;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
@@ -18,6 +19,7 @@ public class TestArrayRingBuffer {
      */
     public static void main(String[] args) {
         jh61b.junit.textui.runClasses(TestArrayRingBuffer.class);
+//        simulation();
     }
 
     public static void printFunction() {
@@ -124,6 +126,46 @@ public class TestArrayRingBuffer {
         for (Integer integer : arb) {
             System.out.print(integer + ", ");
         }
+    }
+
+    @Test
+    public void simulation() {
+        ArrayRingBuffer<Double> arb = new ArrayRingBuffer<>(4);
+        arb.enqueue(1.0);
+        arb.enqueue(1.0);
+        arb.enqueue(1.0);
+        arb.enqueue(1.0);
+        System.out.println(arb);
+        assertTrue(arb.isFull());
+        assertFalse(arb.isEmpty());
+
+        // create number
+        ArrayList<Double> save = new ArrayList<>();
+        for (int i = 0; i < arb.capacity(); i++) {
+            double r;
+            do {
+                r = Math.random() - 0.5;
+            } while (save.contains(r));
+            save.add(r);
+        }
+        System.out.println(save);
+
+        // remove deque until throw RunTimeException
+        System.out.println("until throw RunTimeException");
+        System.out.println(arb);
+        try {
+            for (int i = arb.fillCount(); i >= 0; i--) {
+                arb.dequeue();
+            }
+        } catch (RuntimeException e) {
+            System.out.println("RunTimeException: deque empty");
+        }
+
+//        assert arb.isEmpty();
+        for (double item: save) {
+            arb.enqueue(item);
+        }
+        System.out.println(arb);
     }
 
     @Test
