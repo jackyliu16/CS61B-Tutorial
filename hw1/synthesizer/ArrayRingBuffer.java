@@ -1,6 +1,5 @@
 package synthesizer;// TODO: Make sure to make this class a part of the synthesizer package
 // package <package name>;
-import synthesizer.AbstractBoundedQueue;
 
 import java.util.Iterator;
 import java.util.Spliterator;
@@ -65,7 +64,7 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> implements Bound
     /**
      * Return oldest item, but don't remove it.
      */
-    public T peek() throws RuntimeException{
+    public T peek() throws RuntimeException {
         if (isEmpty()) {
             throw new RuntimeException("the buffer is empty");
         }
