@@ -23,7 +23,7 @@ public class TestArrayRingBuffer {
     }
 
     public static void printFunction() {
-        System.out.printf("[%20s] ========== OUTPUT ========== \n",
+        System.out.printf("[%16s] ========== OUTPUT ========== \n",
                 Thread.currentThread().getStackTrace()[2].getMethodName()
         );
     }
@@ -56,6 +56,7 @@ public class TestArrayRingBuffer {
 
     @Test
     public void fullTest() {
+        printFunction();
         ArrayRingBuffer<Integer> arb = new ArrayRingBuffer<>(4);
         try {
             arb.enqueue(1);
@@ -86,6 +87,7 @@ public class TestArrayRingBuffer {
 
     @Test
     public void testEmpty() {
+        printFunction();
         ArrayRingBuffer<Integer> arb = new ArrayRingBuffer<>(4);
         try {
             System.out.println(arb.peek());
@@ -104,6 +106,7 @@ public class TestArrayRingBuffer {
 
     @Test
     public void enqueueAndDequeue() {
+        printFunction();
         ArrayRingBuffer<Integer> arb = new ArrayRingBuffer<>(5);
         arb.enqueue(1);
         arb.enqueue(2);
@@ -113,6 +116,7 @@ public class TestArrayRingBuffer {
     }
     @Test
     public void iterTest() {
+        printFunction();
         ArrayRingBuffer<Integer> arb = new ArrayRingBuffer<>(8);
         arb.enqueue(1);
         arb.enqueue(2);
@@ -130,6 +134,7 @@ public class TestArrayRingBuffer {
 
     @Test
     public void simulation() {
+        printFunction();
         ArrayRingBuffer<Double> arb = new ArrayRingBuffer<>(4);
         arb.enqueue(1.0);
         arb.enqueue(1.0);
@@ -170,6 +175,7 @@ public class TestArrayRingBuffer {
 
     @Test
     public void simulation2() {
+        printFunction();
         ArrayRingBuffer<Double> arb = new ArrayRingBuffer<>(10);
         arb.enqueue(0.2);
         arb.enqueue(0.4);
@@ -189,6 +195,35 @@ public class TestArrayRingBuffer {
         System.out.printf("item: {%s}, peek: {%s}\n", item, peek);
         arb.enqueue((0.996 * (item + peek)) / 2);
 
+        System.out.println(arb);
+    }
+
+    @Test
+    public void peek() {
+        ArrayRingBuffer<Integer> arb = new ArrayRingBuffer<>(5);
+        arb.enqueue(1);
+        arb.enqueue(2);
+        arb.enqueue(3);
+        arb.enqueue(4);
+        arb.enqueue(5);
+        System.out.println(arb);
+        assertEquals(1, (int) arb.dequeue());
+        arb.enqueue(5);
+        assertEquals(2, (int) arb.peek());
+        assertEquals(2, (int) arb.dequeue());
+        System.out.println(arb);
+        arb.enqueue(6);
+        assertEquals(3, (int) arb.peek());
+        assertEquals(3, (int) arb.dequeue());
+        assertEquals(4, (int) arb.peek());
+        assertEquals(4, (int) arb.dequeue());
+        assertEquals(5, (int) arb.peek());
+        assertEquals(5, (int) arb.dequeue());
+        assertEquals(5, (int) arb.peek());
+        assertEquals(5, (int) arb.dequeue());
+        assertEquals(6, (int) arb.peek());
+        assertEquals(6, (int) arb.dequeue());
+        System.out.println(arb.peek());
         System.out.println(arb);
     }
 
