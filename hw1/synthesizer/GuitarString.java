@@ -47,7 +47,7 @@ public class GuitarString {
         // first deque until throw RunTimeException
         try {
             // remove all items
-            for (int i = 0; i < buffer.fillCount(); i++) {
+            for (int i = buffer.fillCount(); i >= 0; i--) {
                 buffer.dequeue();
             }
         } catch (RuntimeException e) {
