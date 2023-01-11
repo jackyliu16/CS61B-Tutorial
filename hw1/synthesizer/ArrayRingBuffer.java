@@ -68,9 +68,6 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> implements Bound
      * Return oldest item, but don't remove it.
      */
     public T peek() {
-//        if (isEmpty()) {
-//            throw new RuntimeException("the buffer is empty");
-//        }
         assert this.fillCount != 0;
         return this.rb[this.first];
     }
