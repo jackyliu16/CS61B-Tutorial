@@ -169,6 +169,30 @@ public class TestArrayRingBuffer {
     }
 
     @Test
+    public void simulation2() {
+        ArrayRingBuffer<Double> arb = new ArrayRingBuffer<>(10);
+        arb.enqueue(0.2);
+        arb.enqueue(0.4);
+        arb.enqueue(0.5);
+        arb.enqueue(0.3);
+        arb.enqueue(-0.2);
+        arb.enqueue(0.4);
+        arb.enqueue(0.3);
+        arb.enqueue(0.0);
+        arb.enqueue(-0.1);
+        arb.enqueue(-0.3);
+        System.out.println(arb);
+
+        double item = arb.dequeue();
+        double peek = arb.peek();
+
+        System.out.printf("item: {%s}, peek: {%s}\n", item, peek);
+        arb.enqueue((0.996 * (item + peek)) / 2);
+
+        System.out.println(arb);
+    }
+
+    @Test
     public void iterTestEmpty() {
         ArrayRingBuffer<Integer> arb = new ArrayRingBuffer<>(8);
         for (Integer integer: arb) {
