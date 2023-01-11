@@ -1,6 +1,7 @@
 package synthesizer;// TODO: Make sure to make this class a part of the synthesizer package
 // package <package name>;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.function.Consumer;
@@ -24,6 +25,7 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> implements Bound
         this.fillCount = 0;
         this.capacity = capacity;
         this.rb = (T[]) new Object[capacity];
+        Arrays.fill(this.rb, 0);
     }
 
     /**
