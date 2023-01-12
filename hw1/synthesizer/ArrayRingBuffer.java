@@ -24,7 +24,7 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> implements Bound
         this.last = 0;
         this.fillCount = 0;
         this.capacity = capacity;
-        this.rb = (T[]) new Object[capacity];
+        this.rb = (T[]) new Object[capacity+1];
 //        Arrays.fill(this.rb, 0);
     }
 
