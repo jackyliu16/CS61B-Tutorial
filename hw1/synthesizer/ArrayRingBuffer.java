@@ -38,13 +38,18 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> implements Bound
             throw new RuntimeException("Ring Buffer Overflow");
         }
         // if now last wasn't empty then will not enqueue
-        if (this.rb[this.last] != null) {
-            // if the place have been use
-            return;
-        } else {
-            this.rb[this.last] = x;
-            this.last = (this.last + 1 + this.capacity) % this.capacity;
+//        if (this.rb[this.last] != null) {
+//            // if the place have been use
+//            return;
+//        } else {
+//            this.rb[this.last] = x;
+//            this.last = (this.last + 1 + this.capacity) % this.capacity;
+//        }
+        rb[last++] = x;
+        if (last == capacity) {
+            last = 0;
         }
+        fillCount++;
     }
 
     /**
@@ -57,9 +62,14 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> implements Bound
             throw new RuntimeException("Ring Buffer Underflow");
         }
         this.fillCount--;
-        T res = this.rb[this.first];
-        this.rb[this.first] = null;
-        this.first = (this.first + 1 + this.capacity) % this.capacity;
+//        T res = this.rb[this.first];
+//        this.rb[this.first] = null;
+//        this.first = (this.first + 1 + this.capacity) % this.capacity;
+//        return res;
+        T res = rb[first++];
+        if (first == capacity) {
+            first = 0;
+        }
         return res;
     }
 
