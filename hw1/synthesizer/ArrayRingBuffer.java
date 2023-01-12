@@ -33,11 +33,10 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> implements Bound
      * throw new RuntimeException("Ring buffer overflow"). Exceptions
      * covered Monday.
      */
-    public void enqueue(T x) throws RuntimeException {
+    public void enqueue(T x) {
         if (isFull()) {
-            throw new RuntimeException("array full");
+            throw new RuntimeException("Ring Buffer Overflow");
         }
-        this.fillCount += 1;
         // if now last wasn't empty then will not enqueue
         if (this.rb[this.last] != null) {
             // if the place have been use
@@ -53,9 +52,9 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> implements Bound
      * throw new RuntimeException("Ring buffer underflow"). Exceptions
      * covered Monday.
      */
-    public T dequeue() throws RuntimeException {
+    public T dequeue() {
         if (isEmpty()) {
-            throw new RuntimeException("the buffer is empty");
+            throw new RuntimeException("Ring Buffer Underflow");
         }
         this.fillCount--;
         T res = this.rb[this.first];
@@ -68,6 +67,9 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> implements Bound
      * Return oldest item, but don't remove it.
      */
     public T peek() {
+        if (isEmpty()) {
+            throw new RuntimeException("Ring Buffer Underflow");
+        }
         assert this.fillCount != 0;
         return this.rb[this.first];
     }
@@ -90,16 +92,6 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> implements Bound
     @Override
     public Iterator<T> iterator() {
         return new ArrayRingBufferIter();
-    }
-
-    @Override
-    public void forEach(Consumer<? super T> action) {
-        BoundedQueue.super.forEach(action);
-    }
-
-    @Override
-    public Spliterator<T> spliterator() {
-        return BoundedQueue.super.spliterator();
     }
 
     private class ArrayRingBufferIter implements Iterator<T> {
