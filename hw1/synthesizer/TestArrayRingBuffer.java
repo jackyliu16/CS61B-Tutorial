@@ -223,7 +223,7 @@ public class TestArrayRingBuffer {
         assertEquals(5, (int) arb.dequeue());
         assertEquals(6, (int) arb.peek());
         assertEquals(6, (int) arb.dequeue());
-        System.out.println(arb.peek());
+//        System.out.println(arb.peek());
         System.out.println(arb);
     }
 

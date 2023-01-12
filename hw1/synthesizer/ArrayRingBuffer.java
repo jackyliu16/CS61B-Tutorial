@@ -45,6 +45,7 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> implements Bound
             this.rb[this.last] = x;
             this.last = (this.last + 1 + this.capacity) % this.capacity;
         }
+        this.fillCount++;
     }
 
     /**
