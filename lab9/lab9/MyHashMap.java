@@ -1,5 +1,6 @@
 package lab9;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -53,19 +54,48 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      */
     @Override
     public V get(K key) {
-        throw new UnsupportedOperationException();
+        return this.buckets[hash(key)].get(key);
     }
 
     /* Associates the specified value with the specified key in this map. */
     @Override
     public void put(K key, V value) {
-        throw new UnsupportedOperationException();
+        // the return value of hash is the position of buckets
+        if (loadFactor() > MAX_LF)
+            expandSize();
+        this.buckets[hash(key)].put(key, value);
+        this.size = countSize();
+    }
+
+    private int countSize() {
+        int cnt = 0;
+        for (int i = 0; i < buckets.length; i++) {
+            cnt += this.buckets[i].size();
+        }
+        return cnt;
     }
 
     /* Returns the number of key-value mappings in this map. */
     @Override
     public int size() {
-        throw new UnsupportedOperationException();
+        return size;
+    }
+
+    private void expandSize() {
+        ArrayMap<K, V>[] newArr = new ArrayMap[this.buckets.length * 2];
+
+        // init
+        System.arraycopy(this.buckets, 0, newArr, 0, this.buckets.length);
+        for (int i = this.buckets.length; i < newArr.length; i++ ) {
+            newArr[i] = new ArrayMap<>();
+        }
+
+        // end check make sure each one of it wasn't null
+        for (ArrayMap<K, V> item: newArr) {
+            assert item != null;
+        }
+
+        this.buckets = newArr;
     }
 
     //////////////// EVERYTHING BELOW THIS LINE IS OPTIONAL ////////////////
