@@ -1,7 +1,7 @@
 package lab9;
 
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Implementation of interface Map61B with BST as core data structure.
@@ -115,8 +115,14 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     /* Returns a Set view of the keys contained in this map. */
     @Override
     public Set<K> keySet() {
-        throw new UnsupportedOperationException();
+        TreeSet<K> set = new TreeSet<>();
+        for (K item: this) {
+            set.add(item);
+        }
+        return set;
     }
+
+
 
     /** Removes KEY from the tree if present
      *  returns VALUE removed,
@@ -138,6 +144,52 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     @Override
     public Iterator<K> iterator() {
-        throw new UnsupportedOperationException();
+        return new BSTMapIter();
+    }
+
+    private class BSTMapIter implements Iterator<K> {
+        private int pos;
+        private int cnt;
+        private ArrayList<Node> node_list;
+
+        BSTMapIter() {
+            pos = 0;    // the position in node_list
+            cnt = 0;
+            node_list = getHelper(root);
+        }
+
+        @Override
+        public boolean hasNext() {
+            return pos < size;
+        }
+
+        @Override
+        public K next() {
+            return node_list.get(pos++).key;
+        }
+
+        public ArrayList<Node> getHelper(Node p) {
+            ArrayList<Node> res = new ArrayList<>();
+            Stack<Node> stack = new Stack<>();
+
+            stack.add(root);
+            while (!stack.isEmpty()) {
+                Node t = stack.pop();
+                res.add(t);
+
+                if (t.right != null) {
+                    stack.add(t.right);
+                }
+                if (t.left != null) {
+                    stack.add(t.left);
+                }
+            }
+            return res;
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super K> action) {
+            Iterator.super.forEachRemaining(action);
+        }
     }
 }
