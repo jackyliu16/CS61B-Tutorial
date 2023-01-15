@@ -40,7 +40,6 @@ public class CapersRepository {
             System.out.println("there is a IOException: create story file error !");
             e.printStackTrace();
         }
-        System.out.println("finish setup file");
     }
 
     /**
@@ -54,11 +53,12 @@ public class CapersRepository {
         assert f.exists();
 
         // read from the file
-        System.out.println(f);
-//        String file_context = Utils.readContentsAsString(f);
-//        System.out.println(file_context);
-
-
+        String file_context = Utils.readContentsAsString(f);
+        // write the info into the file
+        file_context += text;
+        file_context += "\n";
+        System.out.println(file_context);
+        Utils.writeContents(f, file_context);
     }
 
     /**
