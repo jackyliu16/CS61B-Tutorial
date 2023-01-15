@@ -32,14 +32,17 @@ public class CapersRepository {
      *    - story -- file containing the current story
      */
     public static void setupPersistence() {
-        assert CAPERS_FOLDER.mkdir();
-        assert Utils.join(CAPERS_FOLDER, "dogs").mkdir();
+        CAPERS_FOLDER.mkdir();
+        Dog.DOG_FOLDER.mkdir();
         try {
-            assert Utils.join(CAPERS_FOLDER, "story").createNewFile();
+            Utils.join(CAPERS_FOLDER, "story").createNewFile();
         } catch (IOException e) {
             System.out.println("there is a IOException: create story file error !");
             e.printStackTrace();
         }
+        assert CAPERS_FOLDER.exists();
+        assert Dog.DOG_FOLDER.exists();
+        assert Utils.join(CAPERS_FOLDER, "story").exists();
     }
 
     /**
@@ -67,7 +70,10 @@ public class CapersRepository {
      * Also prints out the dog's information using toString().
      */
     public static void makeDog(String name, String breed, int age) {
-        // TODO
+        Dog dog = new Dog(name, breed, age);
+        dog.saveDog();
+//        System.out.println(Dog.fromFile(name));
+        System.out.println(dog);
     }
 
     /**
@@ -77,6 +83,8 @@ public class CapersRepository {
      * @param name String name of the Dog whose birthday we're celebrating.
      */
     public static void celebrateBirthday(String name) {
-        // TODO
+        Dog birthDog = Dog.fromFile(name);
+        birthDog.haveBirthday();
+        birthDog.saveDog();     // save the age change information
     }
 }
