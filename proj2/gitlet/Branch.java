@@ -20,10 +20,14 @@ public class Branch implements Serializable {
         this.commit = new Commit();
     }
 
-    public void addCommit(String message) {
-        this.commit = new Commit(this.commit, message);
-        Helper.saveBranch(this);
+    public String toString() {
+        return String.format(
+                """
+                Name: %s
+                Commit: %s
+                """,
+                name,
+                Utils.sha1((Object) Utils.serialize(this.commit))
+        );
     }
-
-
 }
