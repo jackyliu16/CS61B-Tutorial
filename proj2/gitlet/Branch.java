@@ -8,15 +8,21 @@ package gitlet;
  * @Version:0.0
  */
 
-public class Branch {
+import java.io.Serializable;
+
+public class Branch implements Serializable {
+    static final String DEFAULT_REPO_NAME = "master";
+    String name;
     Commit commit;
 
     public Branch() {
+        this.name = DEFAULT_REPO_NAME;
         this.commit = new Commit();
     }
 
     public void addCommit(String message) {
-
+        this.commit = new Commit(this.commit, message);
+        Helper.saveBranch(this);
     }
 
 
