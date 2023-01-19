@@ -40,7 +40,7 @@ public class Helper {
         for (String name: fileName) {
             File file = Utils.join(REPO, name);
             try {
-                file.createNewFile();
+                flag = file.createNewFile() && flag;
             } catch (IOException e) {
                 log.error("IOException when create file %s", file);
                 e.printStackTrace();
