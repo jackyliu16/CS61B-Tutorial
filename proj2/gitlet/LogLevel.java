@@ -1,3 +1,4 @@
+package gitlet;
 public enum LogLevel {
     OFF,
     Error,

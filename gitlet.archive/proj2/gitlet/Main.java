@@ -1,10 +1,12 @@
 package gitlet;
 
+import gitlet.Logger;
+
 /** Driver class for Gitlet, a subset of the Git version-control system.
  *  @author TODO
  */
 public class Main {
-
+    static Logger = Logger.INSTANCE; 
     /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */

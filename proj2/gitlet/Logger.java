@@ -1,3 +1,4 @@
+package gitlet;
 /*
  * @File:   Logger.java
  * @Desc:
@@ -24,21 +25,36 @@ public enum Logger {
     public void error(String message) {
         log(LogLevel.Error, message);
     }
+    public void error(String message, Object...args) {
+        log(LogLevel.Error, String.format(message, args));
+    }
 
     public void warn(String message) {
         log(LogLevel.Warn, message);
+    }
+    public void warn(String message, Object...args) {
+        log(LogLevel.Warn, String.format(message, args));
     }
 
     public void info(String message) {
         log(LogLevel.Info, message);
     }
+    public void info(String message, Object...args) {
+        log(LogLevel.Info, String.format(message, args));
+    }
 
     public void debug(String message) {
         log(LogLevel.Debug, message);
     }
+    public void debug(String message, Object...args) {
+        log(LogLevel.Debug, String.format(message, args));
+    }
 
     public void trace(String message) {
         log(LogLevel.Trace, message);
+    }
+    public void trace(String message, Object...args) {
+        log(LogLevel.Trace, String.format(message, args));
     }
 
     /**
@@ -113,10 +129,12 @@ public enum Logger {
                 Thread currentThread = Thread.currentThread();
                 StackTraceElement[] ste = currentThread.getStackTrace();
 //                StackTraceElement stackTrace = currentThread.getStackTrace()[4];
-                StackTraceElement stackTraceElement = ste[ste.length-1];
+//                StackTraceElement stackTraceElement = ste[ste.length-1];
+                StackTraceElement stackTraceElement = ste[3];
                 String output = String.format("[%s](%s:%s): %s",
 //                        levelIntoString(out_level),
-                        currentThread.getName(),
+//                        currentThread.getName(),
+                        stackTraceElement.getMethodName(),
                         stackTraceElement.getFileName(),
                         stackTraceElement.getLineNumber(),
                         message);
