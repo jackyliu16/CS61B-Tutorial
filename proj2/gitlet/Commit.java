@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 public class Commit implements Serializable {
     static transient File commitFolder = Utils.join(Helper.REPO, Helper.COMMIT_FOLDER);
-    static transient File log = Utils.join(Helper.REPO, Helper.LOG_FILE);
+//    static transient File log = Utils.join(Helper.REPO, Helper.LOG_FILE);
     String logMessage;
     Timestamp timestamp;
     HashMap<String, File> mapping;
@@ -46,8 +46,9 @@ public class Commit implements Serializable {
 
     private void log() {
         // add info into log file
-        assert log.exists();
-        Utils.writeContents(log, toString());
+//        assert log.exists();
+//        Utils.writeContents(log, toString());
+        Helper.addContentIntoLog(toString());
 
         // save commit node in the file
         saveCommitInFile();

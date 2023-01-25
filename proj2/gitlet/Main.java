@@ -14,7 +14,7 @@ public class Main {
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
     public static void main(String[] args) {
-        log.setLogLevel(LogLevel.Trace);
+        log.setLogLevel(LogLevel.Debug);
         log.debug("start Main function");
 
         // if args is empty
@@ -25,11 +25,11 @@ public class Main {
         }
 
         String firstArg = args[0];
+        StatusController sc;
 
         switch (firstArg) {
-            case "init" -> {
+            case "init" -> {    // finish
                 log.debug("init command");
-                // TODO: handle the `init` command
                 if (ifGitLetDirectoryExists()) {
                     System.out.println("A Gitlet version-control system already exists in the current directory.");
                     System.exit(0);
@@ -41,6 +41,20 @@ public class Main {
                 // TODO: handle the `add [filename]` command
                 log.debug("add command");
                 exitIfNotGitLetDirectory();
+                sc = Helper.getStatus();
+                if (args.length < 1) {
+                    System.out.println("Incorrect operands.");
+                    System.exit(0);
+                }
+
+                // calling add operation
+                for (int i = 1; i < args.length; i++ ) {
+                    log.debug("args[%d] = %s", i, args[i]);
+                    sc.addFile(args[i]);
+                }
+
+                // save StatusController
+                Helper.saveStatus(sc);
             }
 
             case "commit" -> {
@@ -114,6 +128,9 @@ public class Main {
                 System.exit(0);
             }
         }
+        sc = Helper.getStatus();
+        log.debug("%s", sc.stagedFile);
+        log.debug("%s", sc);
     }
 
     public static void exitIfNotGitLetDirectory() {
