@@ -9,6 +9,8 @@ package gitlet;
  */
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 public class Helper {
     static final Logger log = Logger.INSTANCE;
@@ -89,9 +91,26 @@ public class Helper {
     }
 
     public static void addContentIntoLog(String message) {
+        log.info("addContentIntoLog");
         File logFile = Utils.join(REPO, CACHE_FOLDER, LOG_FILE);
         assert logFile.exists();
-        Utils.writeContents(logFile, message);
+        // append the message at the top of the file
+        try {
+            BufferedInputStream in = new BufferedInputStream(new FileInputStream(logFile));
+            byte[] buffer = in.readAllBytes();  // read all byte from file
+            byte[] append = message.getBytes(StandardCharsets.UTF_8);
+            in.close();
+            BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(logFile.toPath()));
+            out.write(append);
+            if (buffer.length != 0)
+                out.write(buffer);
+            out.close();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+//        Utils.writeContents(logFile, message);
     }
 
     public static Branch getCurrent() {

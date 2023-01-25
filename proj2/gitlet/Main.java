@@ -15,7 +15,7 @@ public class Main {
      */
     public static void main(String[] args) {
         log.setLogLevel(LogLevel.Debug);
-        log.debug("start Main function");
+        log.info("========== NEXT OPERATION %s ==========", args[0]);
 
         // if args is empty
         if (args.length == 0) {
@@ -61,11 +61,14 @@ public class Main {
                 // TODO: handle commit [message] command
                 log.debug("commit command");
                 exitIfNotGitLetDirectory();
-                if (args.length > 1) {
+                if (args.length > 2) {
                     // NOTE: in the accusation right now the user will only input one file at the time.
                     System.out.println("Incorrect operands.");
                     System.exit(0);
                 }
+                sc = Helper.getStatus();
+                sc.commit(args[1]);
+                Helper.saveStatus(sc);
             }
 
             case "checkout" -> {
@@ -84,6 +87,8 @@ public class Main {
             case "status" -> {
                 log.debug("status command");
                 exitIfNotGitLetDirectory();
+                sc = Helper.getStatus();
+                System.out.println(sc);
             }
 
             case "rm" -> {
@@ -128,9 +133,6 @@ public class Main {
                 System.exit(0);
             }
         }
-        sc = Helper.getStatus();
-        log.debug("%s", sc.stagedFile);
-        log.debug("%s", sc);
     }
 
     public static void exitIfNotGitLetDirectory() {

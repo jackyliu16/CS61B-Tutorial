@@ -8,9 +8,8 @@ package gitlet;
  * @Version:0.0
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
+import java.nio.file.Files;
 import java.sql.SQLOutput;
 import java.util.Arrays;
 
@@ -76,3 +75,23 @@ class Node implements Serializable {
                 """, str, aNum);
     }
 }
+/* log write test
+    File logFile = Utils.join(CWD, "commitTest.txt");
+    String message = "good bye, world";
+        try {
+                BufferedInputStream in = new BufferedInputStream(new FileInputStream(logFile));
+                byte[] buffer = in.readAllBytes();  // read all byte from file
+                byte[] append = message.getBytes();
+                log.debug("%s", Arrays.toString(buffer));
+                log.debug("%s", Arrays.toString(append));
+                in.close();
+                BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(logFile.toPath()));
+                out.write(append);
+                out.write(buffer);
+                out.close();
+                } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+                } catch (IOException e) {
+                throw new RuntimeException(e);
+                }
+*/

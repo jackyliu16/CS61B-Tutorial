@@ -12,12 +12,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
-import static gitlet.Helper.BLOB_FOLDER;
-import static gitlet.Helper.CWD;
-import static gitlet.Helper.REPO;
+import static gitlet.Helper.*;
 
 public class StatusController implements Serializable {
     static final String SAVE_FILE = "StatusCache";
@@ -46,22 +46,29 @@ public class StatusController implements Serializable {
         if (inp.exists()) {
             // collect the hash of the file content.
             String hash = Utils.sha1(Utils.serialize(inp));
-            log.info("hash %s", hash);
+            log.debug("hash %s", hash);
+
+            // nothing change since the latest commit
+            if (getCurrent().commit.checkIfSame(fileName, hash)) {
+                log.info("the add file is as same as the file in the latest commit");
+
+                return;
+            }
+
             // if the file path in mapping, compare the hash from mapping and collect this time.
             if (stagedFile.containsKey(fileName) && Objects.equals(stagedFile.get(fileName), hash)) {
-                log.info("stagedFile contains file and the map is same as %s ", hash);
                 /// same -> do nothing
-                log.info("nothing to update");
+                log.info("stagedFile contains file and the map is same as %s ", hash);
                 return;
             } else {
                 /// else -> copy the file in blob and remove the original file
                 stagedFile.remove(fileName);
             }
-            System.out.println(Objects.equals(stagedFile.get(fileName), hash));
+
             /// else if the path wasn't in mapping -> copy the file in to the file with hash as it's name.
 
-            // copy file into blob
-            File des = Utils.join(REPO, BLOB_FOLDER, hash);
+            // copy file into cache folder
+            File des = Utils.join(REPO, CACHE_FOLDER, hash);
             assert !des.exists();
             try {
                 Helper.copyFile(inp, des);
@@ -96,8 +103,60 @@ public class StatusController implements Serializable {
      * 2. remove the removed File from removedFile
      * 3. check if the file in the lastest commit has been change
      */
-    public void commit() {
+    public void commit(String message) {
+        log.debug("commit args[1]: %s", message);
+        // 1. copy all the file inside the cache and rename it into blob folder
+        // 2. clear the mapping
+        // 3. remove the file which has the same hash as removedFile mapping.
 
+        // copy the lastest commit
+        Branch current = Helper.getCurrent();
+        Commit newCom = Commit.appendCommit(current.commit, false, message);  // BC the lastest commit saving the mapping between blob and file path, thus you copy the commit struct should also copy the mapping.
+        // NOTE: check if dest file exist: the situation that the file change back to the original part(hash same) -> if same just delete
+
+        // if stagedFile and removedFile is empty (nothing to commit) or some file has been change (reject)
+        log.debug("%s", stagedFile);
+        log.debug("%s", removedFile);
+
+        if ((stagedFile.isEmpty() && removedFile.isEmpty()) || !newCom.ifFileHasChange().isEmpty()) {
+            log.info("nothing in the stageFile and removedFile ");
+            // TODO nothing to change
+            return;
+        }
+
+        boolean flag = true; // if false than do nothing
+        for (String fileName: stagedFile.keySet()) {
+            File in = Utils.join(REPO, CACHE_FOLDER, stagedFile.get(fileName));
+            File out = Utils.join(REPO, BLOB_FOLDER, stagedFile.get(fileName));
+            // hash same as it's add time
+            if (in.exists() && !out.exists() && Objects.equals(stagedFile.get(fileName), Utils.sha1(Utils.serialize(Utils.join(REPO, fileName))))) {
+                flag = false;
+                log.debug("failure when rename cache file into blobs file :\n\t%s\n\t%s", in, out);
+            }
+        }
+
+        // add all file from stage file into commit
+        for (String fileName: stagedFile.keySet()) {
+            File in = Utils.join(REPO, CACHE_FOLDER, stagedFile.get(fileName));
+            File out = Utils.join(REPO, BLOB_FOLDER, stagedFile.get(fileName));
+            in.renameTo(out); // TODO should remove assert
+            log.debug(stagedFile.get(fileName));
+            log.debug("\n%s", newCom);
+            newCom.mapping.put(fileName, stagedFile.get(fileName)); // add the map between blob and file path
+        }
+
+        // clear cache
+        this.removedFile = new HashMap<>();
+        this.stagedFile = new HashMap<>();
+
+        // save commit
+        String hash = Utils.sha1(Utils.serialize(newCom));
+        File save = Utils.join(REPO, COMMIT_FOLDER, hash);
+        Helper.saveContentInFile(save, newCom);
+
+        Helper.addContentIntoLog(
+                newCom.toString()
+        );
     }
 
     // NOTE: we may need to make up another class to save the information of each file current in the list,
@@ -106,15 +165,36 @@ public class StatusController implements Serializable {
     //  so in this ways i want to using a kind of map like HashMap<String, String>(file path) .
 
     public String toString() {
-        return String.format(
-                """ 
-                StatusController:
-                Branch: %s \tstageFile: %s
-                \tremovedFile: %s
-                """,
-                current,
-                stagedFile,
-                removedFile
-        );
+        File cacheDir = Utils.join(REPO, CACHE_FOLDER);
+        File branchDir = Utils.join(REPO, BRANCH_FOLDER);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== Branches ===\n");
+        sb.append("*").append(Helper.getCurrent().name).append("\n");
+
+        List<String> branchList = Utils.plainFilenamesIn(branchDir);
+        if (!branchList.isEmpty()) {
+            for (String name: branchList) {
+                sb.append(name).append("\n");
+            }
+        }
+
+        sb.append("\n").append("=== Staged Files ===\n");
+        if (!stagedFile.isEmpty()) {
+            for (String name: stagedFile.keySet()) {
+                sb.append(name).append("\n");
+            }
+        }
+
+        sb.append("\n").append("=== Removed Files ===\n");
+        if (!removedFile.isEmpty()) {
+            for (String name: removedFile.keySet()) {
+                sb.append(name).append("\n");
+            }
+        }
+
+        sb.append("others haven't provide");
+
+        return sb.toString();
     }
 }

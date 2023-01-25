@@ -17,7 +17,7 @@ public class Branch implements Serializable {
 
     public Branch() {
         this.name = DEFAULT_REPO_NAME;
-        this.commit = new Commit();
+        this.commit = new Commit(true);
     }
 
     public String toString() {
