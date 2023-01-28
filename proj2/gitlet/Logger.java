@@ -25,34 +25,31 @@ public enum Logger {
     public void error(String message) {
         log(LogLevel.Error, message);
     }
+    public void error(Object arg) { log(LogLevel.Error, String.format("%s", arg)); }
     public void error(String message, Object...args) {
         log(LogLevel.Error, String.format(message, args));
     }
 
-    public void warn(String message) {
-        log(LogLevel.Warn, message);
-    }
+    public void warn(String message) { log(LogLevel.Warn, message); }
+    public void warn(Object arg) { log(LogLevel.Warn, String.format("%s", arg)); }
     public void warn(String message, Object...args) {
         log(LogLevel.Warn, String.format(message, args));
     }
 
-    public void info(String message) {
-        log(LogLevel.Info, message);
-    }
+    public void info(String message) { log(LogLevel.Info, message); }
+    public void info(Object arg) { log(LogLevel.Info, String.format("%s", arg)); }
     public void info(String message, Object...args) {
         log(LogLevel.Info, String.format(message, args));
     }
 
-    public void debug(String message) {
-        log(LogLevel.Debug, message);
-    }
+    public void debug(String message) { log(LogLevel.Debug, message); }
+    public void debug(Object arg) { log(LogLevel.Debug, String.format("%s", arg)); }
     public void debug(String message, Object...args) {
         log(LogLevel.Debug, String.format(message, args));
     }
 
-    public void trace(String message) {
-        log(LogLevel.Trace, message);
-    }
+    public void trace(String message) { log(LogLevel.Trace, message); }
+    public void trace(Object arg) { log(LogLevel.Trace, String.format("%s", arg)); }
     public void trace(String message, Object...args) {
         log(LogLevel.Trace, String.format(message, args));
     }
