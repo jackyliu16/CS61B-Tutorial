@@ -12,6 +12,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.sql.SQLOutput;
 import java.util.Arrays;
+import java.util.regex.*;
 
 import static gitlet.Helper.*;
 
@@ -22,11 +23,9 @@ public class Test {
     static final File TEST_FOLDER = Utils.join(CWD, "test");
     public static void main(String[] args) throws IOException {
         log.setLogLevel(LogLevel.Trace);
-        // get a files hash
-        File file = Utils.join(REPO, CACHE_FOLDER, HEAD_FILE);
-        Branch branch = Utils.readObject(file, Branch.class);
-        System.out.println(branch);
 
+        boolean isMatch = Pattern.matches("[a-f0-9]{40}", args[0]);
+        System.out.println(isMatch);
     }
 }
 

@@ -3,6 +3,7 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.regex.*;
 
 import static gitlet.Helper.BLOB_FOLDER;
 import static gitlet.Helper.REPO;
@@ -93,8 +94,13 @@ public class Main {
                     } catch (IOException e) {
                         log.error("IOException");
                     }
+                } else if (Pattern.matches("[a-f0-9]{40}", args[1])) {
+                    // if the input is match to a commit
+                    // 1. check if the commit exist
+                    // 2. if the file exist in the commit, just copy it and overwrite the file in the work directory
+                    throw new UnsupportedOperationException();
                 } else {
-                    // if is a commit or other
+                    // first check if the name is the branch
                     throw new UnsupportedOperationException();
                 }
             }
