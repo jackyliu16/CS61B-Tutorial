@@ -2,11 +2,11 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.*;
 
-import static gitlet.Helper.BLOB_FOLDER;
-import static gitlet.Helper.REPO;
+import static gitlet.Helper.*;
 
 /** Driver class for Gitlet, a subset of the Git version-control system.
  *  @author jackyliu16@github.com
@@ -81,10 +81,11 @@ public class Main {
                 // args[0] = flag
                 log.debug("checkout command");
                 exitIfNotGitLetDirectory();
-                if (Objects.equals(args[1], "--")) {
+                if (args.length == 3 && Objects.equals(args[1], "--")) {
+                    // checkout -- [filename]
                     // cp the file in the latest commit into work directory
-                    if (args.length != 3) log.error("there is a error in args");
                     String hash = Helper.getCurrent().getLatestCommit().getFileHashIfExist(args[2]);
+                    if (hash == null) exitProgramWithMessage("File does not exist in that commit. ");
                     log.debug(hash);
                     // just copy the file in the blob folder into the place ?
                     File original = Utils.join(REPO, BLOB_FOLDER, hash);
@@ -94,14 +95,43 @@ public class Main {
                     } catch (IOException e) {
                         log.error("IOException");
                     }
-                } else if (Pattern.matches("[a-f0-9]{40}", args[1])) {
+                } else if (args.length == 4 && Pattern.matches("[a-f0-9]{40}", args[1])) {
+                    // checkout [commit-id] -- [file name]
+                    // TODO if we only using the unique prefix to find the commit
                     // if the input is match to a commit
                     // 1. check if the commit exist
                     // 2. if the file exist in the commit, just copy it and overwrite the file in the work directory
-                    throw new UnsupportedOperationException();
+                    if (!Objects.equals(args[2], "--")) exitProgramWithMessage("Incorrect operands.");
+                    File commitFile = Utils.join(REPO, COMMIT_FOLDER, args[1]);
+                    if (!commitFile.exists()) exitProgramWithMessage("No commit with that id exists.");
+                    Commit commit = Utils.readObject(commitFile, Commit.class);
+                    String hash = commit.getFileHashIfExist(args[2]);
+                    if (hash == null) exitProgramWithMessage("File does not exist in that commit.");
+                    // just copy the file in the blob folder into the place ?
+                    File original = Utils.join(REPO, BLOB_FOLDER, hash);
+                    File destination = Utils.join(CWD, hash);
+                    try {
+                        Helper.copyFile(original, destination);
+                    } catch (IOException e) {
+                        log.error("IOException");
+                    }
                 } else {
+                    // checkout [branch name]
+                    if (args.length != 2) exitProgramWithMessage("Incorrect operands.");
                     // first check if the name is the branch
-                    throw new UnsupportedOperationException();
+//                  BC we need to compare if the branch is current branch thus we not using Branch branch = Helper.getBranchIfExist(args[1]);
+                    if (Objects.equals(getCurrent().getName(), args[2])) exitProgramWithMessage("No need to checkout the current branch.");
+                    List<String> branchNames = Utils.plainFilenamesIn(Utils.join(REPO, BRANCH_FOLDER));
+                    if (branchNames == null || branchNames.isEmpty()) exitProgramWithMessage("No such branch exists.");
+                    // BC the name of the branchFile is the branch name
+                    Branch branch;
+                    if (branchNames.contains(args[1])) {
+                        File branchFile = Utils.join(REPO, BRANCH_FOLDER, args[1]);
+                        branch = Utils.readObject(branchFile, Branch.class);
+                    } else {
+                        exitProgramWithMessage("No such branch exists.");
+                    }
+                    // TODO finish the copy all file from branch
                 }
             }
 
@@ -182,5 +212,10 @@ public class Main {
         File gitLetDirectly = Utils.join(CWD, REPO_NAME);
         log.trace(gitLetDirectly.toString());
         return gitLetDirectly.exists();
+    }
+
+    private static void exitProgramWithMessage(String message) {
+        System.out.println(message);
+        System.exit(0);
     }
 }
