@@ -13,6 +13,8 @@ import java.nio.file.Files;
 import java.sql.SQLOutput;
 import java.util.Arrays;
 
+import static gitlet.Helper.*;
+
 public class Test {
     static final Logger log = Logger.INSTANCE;
     static final File CWD = new File(System.getProperty("user.dir"));
@@ -20,6 +22,10 @@ public class Test {
     static final File TEST_FOLDER = Utils.join(CWD, "test");
     public static void main(String[] args) throws IOException {
         log.setLogLevel(LogLevel.Trace);
+        // get a files hash
+        File file = Utils.join(REPO, CACHE_FOLDER, HEAD_FILE);
+        Branch branch = Utils.readObject(file, Branch.class);
+        System.out.println(branch);
 
     }
 }

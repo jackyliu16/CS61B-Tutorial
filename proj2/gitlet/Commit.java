@@ -9,12 +9,15 @@ package gitlet;
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Formatter;
+
 
 import static gitlet.Helper.*;
 
@@ -22,14 +25,16 @@ public class Commit implements Serializable {
     static transient File commitFolder = Utils.join(REPO, Helper.COMMIT_FOLDER);
 //    static transient File log = Utils.join(Helper.REPO, Helper.LOG_FILE);
     String logMessage;
-    Timestamp timestamp;
+//    Timestamp timestamp;
+    Date date;
     HashMap<String, String> mapping;
     Commit prev;
 
     public Commit(boolean logFlag) {
         // will only been call once (by the initial commit)
         logMessage = "initial commit";
-        timestamp = new Timestamp(0);
+//        timestamp = new Timestamp(-28800000);
+        date = new Date(-28800000);
         mapping = new HashMap<>();
         prev = null;
         if (logFlag) log();
@@ -37,7 +42,8 @@ public class Commit implements Serializable {
 
     public Commit(String message, boolean logFlag) {
         logMessage = message;
-        timestamp = new Timestamp(System.currentTimeMillis());
+//        timestamp = new Timestamp(System.currentTimeMillis());
+        date = new Date(System.currentTimeMillis());
         // TODO finish commit mapping (using copy and add or delete from zone)
         mapping = new HashMap<>();
         prev = null;
@@ -70,8 +76,12 @@ public class Commit implements Serializable {
         ArrayList<String> res = new ArrayList<>();
         for (String name: mapping.keySet()) {
             File file = Utils.join(REPO, BLOB_FOLDER, name);
-            if (Objects.equals(mapping.get(name), Utils.sha1(Utils.serialize(file)))) {
-                res.add(name);
+            try {
+                if (Objects.equals(mapping.get(name), Utils.sha1(Files.readAllBytes(file.toPath())))) {
+                    res.add(name);
+                }
+            } catch (IOException e) {
+                log.error("IOException");
             }
         }
         log.debug("ifFileHasChange: %s", res.toString());
@@ -86,6 +96,10 @@ public class Commit implements Serializable {
         return mapping.containsKey(fileName) && Objects.equals(mapping.get(fileName), hash);
     }
 
+    public String getFileHashIfExist(String fileName) {
+        return mapping.get(fileName);
+    }
+
     public String toString() {
         return String.format(
                 """
@@ -93,9 +107,10 @@ public class Commit implements Serializable {
                 commit %s
                 Date: %s
                 %s
+                
                 """,
-                Utils.sha1((Object) Utils.serialize(this)),
-                timestamp.toString(),
+                Utils.sha1(Utils.serialize(this)),
+                String.format("%1$ta %1$tb %1$td %1$tT %1$tY %1$tz", date.getTime()),
                 logMessage
         );
     }

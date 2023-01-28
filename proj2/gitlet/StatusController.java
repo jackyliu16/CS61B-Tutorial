@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +46,12 @@ public class StatusController implements Serializable {
         // if input file exist
         if (inp.exists()) {
             // collect the hash of the file content.
-            String hash = Utils.sha1(Utils.serialize(inp));
+            String hash = null;
+            try {
+                hash = Utils.sha1(Files.readAllBytes(inp.toPath()));
+            } catch (IOException e) {
+                log.error("IOException");
+            }
             log.debug("hash %s", hash);
 
             // nothing change since the latest commit
@@ -129,9 +135,13 @@ public class StatusController implements Serializable {
             File in = Utils.join(REPO, CACHE_FOLDER, stagedFile.get(fileName));
             File out = Utils.join(REPO, BLOB_FOLDER, stagedFile.get(fileName));
             // hash same as it's add time
-            if (in.exists() && !out.exists() && Objects.equals(stagedFile.get(fileName), Utils.sha1(Utils.serialize(Utils.join(REPO, fileName))))) {
-                flag = false;
-                log.debug("failure when rename cache file into blobs file :\n\t%s\n\t%s", in, out);
+            try {
+                if (in.exists() && !out.exists() && Objects.equals(stagedFile.get(fileName), Utils.sha1((Object) Files.readAllBytes(Utils.join(CWD, fileName).toPath())))) {
+                    flag = false;
+                    log.debug("failure when rename cache file into blobs file :\n\t%s\n\t%s", in, out);
+                }
+            } catch (IOException e) {
+                log.error("IOException");
             }
         }
 
@@ -140,6 +150,7 @@ public class StatusController implements Serializable {
             File in = Utils.join(REPO, CACHE_FOLDER, stagedFile.get(fileName));
             File out = Utils.join(REPO, BLOB_FOLDER, stagedFile.get(fileName));
             in.renameTo(out); // TODO should remove assert
+            log.info("\nrename\n\t%s into \n\t%s", in, out);
             log.debug(stagedFile.get(fileName));
             log.debug("\n%s", newCom);
             newCom.mapping.put(fileName, stagedFile.get(fileName)); // add the map between blob and file path
@@ -151,12 +162,48 @@ public class StatusController implements Serializable {
 
         // save commit
         String hash = Utils.sha1(Utils.serialize(newCom));
-        File save = Utils.join(REPO, COMMIT_FOLDER, hash);
-        Helper.saveContentInFile(save, newCom);
+        Helper.saveContentInFile(Utils.join(REPO, COMMIT_FOLDER, hash), newCom);
+        current.commit = newCom;
+        Helper.saveContentInFile(Utils.join(REPO, CACHE_FOLDER, HEAD_FILE), current);   // BC the current branch will only in the cache/HEAD
 
         Helper.addContentIntoLog(
                 newCom.toString()
         );
+    }
+
+    /**
+     * reset a file in a specify file on specify branch
+     * @param branchFile the file which store the branch info, such as HEAD or others.
+     * @param fileName the file path you want to reset
+     */
+    public void checkOutFileInBranch(File branchFile, String fileName) {
+        assert branchFile.exists();
+        File destination = Utils.join(CWD, fileName);
+
+        // BC there is a problem when we reset to a older file, thus we not exit.
+        if (destination.exists()) {
+            log.debug("the file(%s), which you want to checkout wasn't exist", fileName);
+            try {
+                destination.createNewFile();
+            } catch (IOException e) {
+                log.error("IOException when create %s", destination);
+            }
+        }
+
+        // get the branch from store file
+        Branch branch = Utils.readObject(branchFile, Branch.class);
+        log.debug("we are checkout file in %s branch", branch.name);
+
+        // get file hash from the latest commit of specify branch
+        String hash = branch.getFileHash(fileName);
+
+        // copy the file from blob and overwrite the file in
+        File origin = Utils.join(REPO, BLOB_FOLDER, hash);
+        try {
+            Helper.copyFile(origin, destination);
+        } catch (IOException e) {
+            log.debug("IOException when copy %s to %s", origin, destination);
+        }
     }
 
     // NOTE: we may need to make up another class to save the information of each file current in the list,
@@ -193,8 +240,28 @@ public class StatusController implements Serializable {
             }
         }
 
-        sb.append("others haven't provide");
+        // TODO provide the removed files
+        // TODO provide the Modifications Not Staged From Commit 
+        // TODO provide Untracked Files
+        sb.append("\n").append("=== Modifications Not Staged For Commit ===").append("\n");
+        // check all staged file if it has been change
+        List<String> modificationList = getCurrent().commit.ifFileHasChange();
+        if (!modificationList.isEmpty()) {
+            for (String str: modificationList) {
+                sb.append(str).append("\n");
+            }
+        }
 
+        sb.append("\n").append("=== Untracked Files ===").append("\n");
+        List<String> repoFiles = Utils.plainFilenamesIn(CWD);
+        if (repoFiles != null) {
+            for (String str: repoFiles) {
+                if (!(stagedFile.containsKey(str) || removedFile.containsKey(str) || getCurrent().commit.containsFile(str))) {
+                    // if the file wasn't in the repo
+                    sb.append(str).append("\n");
+                }
+            }
+        }
         return sb.toString();
     }
 }

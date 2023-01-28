@@ -10,6 +10,9 @@ package gitlet;
 
 import java.io.Serializable;
 
+import static gitlet.Helper.getCurrent;
+import static gitlet.Helper.log;
+
 public class Branch implements Serializable {
     static final String DEFAULT_REPO_NAME = "master";
     String name;
@@ -18,6 +21,14 @@ public class Branch implements Serializable {
     public Branch() {
         this.name = DEFAULT_REPO_NAME;
         this.commit = new Commit(true);
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public Commit getLatestCommit() {
+        return this.commit;
     }
 
     public String toString() {
@@ -29,5 +40,18 @@ public class Branch implements Serializable {
                 name,
                 Utils.sha1((Object) Utils.serialize(this.commit))
         );
+    }
+
+    public String getFileHash(String fileName) {
+        log.trace("%s", fileName);
+        if (commit.containsFile(fileName)) {
+            return commit.getFileHashIfExist(fileName);
+        } else {
+            log.debug("the latest commit in branch[%s] not contains [%s]",
+                    name,
+                    fileName
+            );
+            return "";
+        }
     }
 }

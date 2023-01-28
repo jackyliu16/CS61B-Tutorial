@@ -11,6 +11,7 @@ package gitlet;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.List;
 
 public class Helper {
     static final Logger log = Logger.INSTANCE;
@@ -140,6 +141,11 @@ public class Helper {
         saveContentInFile(scLocation, sc);
     }
 
+    public static void printLog() {
+        File logFile = Utils.join(REPO, CACHE_FOLDER, LOG_FILE);
+        String str = Utils.readContentsAsString(logFile);
+        System.out.println(str);
+    }
     /** TODO convertAndSaveFile
      * Will Copy the File from work directory to blob directory, with a hash as it's file name
      * NOTE if it's contains a directory that will create a tree node to Save the message
@@ -151,16 +157,20 @@ public class Helper {
 
     /**
      * copy the file from original path into the destination path
+     * if file not exist then create else overwrite
      * @param original the input file
      * @param destination the file direction that we will copy the original to.
-     * @return if success
      * @throws IOException None
      * @throws FileNotFoundException None
      */
     static void copyFile(File original, File destination) throws IOException, FileNotFoundException {
         log.debug("Copy Operation: \n\tinput: %s\n\toutput: %s", original, destination);
         // ref: https://www.baeldung.com/java-copy-file
-        destination.createNewFile();
+//        destination.createNewFile();
+        if (!destination.exists()) {
+            log.debug("create destination file");
+            destination.createNewFile();
+        }
         try {
             InputStream in = new BufferedInputStream(
                     new FileInputStream(original)
@@ -181,5 +191,37 @@ public class Helper {
             log.error("IOException");
             throw e;
         }
+    }
+
+    /**
+     * get the branch class if the branch exist in HEAD file or branch folder
+     * @param branchName the branch name you want to get
+     * @return a branch class or null (if you couldn't found a branch name branchName)
+     */
+    public static Branch getBranchIfExist(String branchName) {
+        // check HEAD
+        File head = Utils.join(REPO, CACHE_FOLDER, HEAD_FILE);
+        assert head.exists();   // shouldn't happen due to check if git repo
+        if (head.getName().equals(branchName)) {
+            return Utils.readObject(head, Branch.class);
+        }
+        // for each file inside the branch folder
+        List<String> branchNames = Utils.plainFilenamesIn(Utils.join(REPO, BRANCH_FOLDER));
+        if (branchNames.isEmpty()) {
+            return null;
+        }
+        // BC the name of the branch file is the branch name
+        if (branchNames.contains(branchName)) {
+            File branch = Utils.join(REPO, BRANCH_FOLDER, branchName);
+            return Utils.readObject(branch, Branch.class);
+        } else {
+            // not found
+            return null;
+        }
+    }
+
+    public static Commit getCommitIfExist(String commitName) {
+        File commitFile = Utils.join(REPO, COMMIT_FOLDER, commitName);
+        return commitFile.exists() ? Utils.readObject(commitFile, Commit.class) : null;
     }
 }

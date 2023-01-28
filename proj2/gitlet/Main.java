@@ -1,6 +1,11 @@
 package gitlet;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
+
+import static gitlet.Helper.BLOB_FOLDER;
+import static gitlet.Helper.REPO;
 
 /** Driver class for Gitlet, a subset of the Git version-control system.
  *  @author jackyliu16@github.com
@@ -14,7 +19,7 @@ public class Main {
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
     public static void main(String[] args) {
-        log.setLogLevel(LogLevel.Debug);
+        log.setLogLevel(LogLevel.OFF);
         log.info("========== NEXT OPERATION %s ==========", args[0]);
 
         // if args is empty
@@ -72,9 +77,26 @@ public class Main {
             }
 
             case "checkout" -> {
+                // args[0] = flag
                 log.debug("checkout command");
                 exitIfNotGitLetDirectory();
-                // TODO: if there is more than one string has been input?
+                if (Objects.equals(args[1], "--")) {
+                    // cp the file in the latest commit into work directory
+                    if (args.length != 3) log.error("there is a error in args");
+                    String hash = Helper.getCurrent().getLatestCommit().getFileHashIfExist(args[2]);
+                    log.debug(hash);
+                    // just copy the file in the blob folder into the place ?
+                    File original = Utils.join(REPO, BLOB_FOLDER, hash);
+                    File destination = Utils.join(CWD, args[2]);
+                    try {
+                        Helper.copyFile(original, destination);
+                    } catch (IOException e) {
+                        log.error("IOException");
+                    }
+                } else {
+                    // if is a commit or other
+                    throw new UnsupportedOperationException();
+                }
             }
 
             // TODO: handler checkout command;
@@ -98,7 +120,7 @@ public class Main {
 
             case "log" -> {
                 log.debug("log command");
-                throw new UnsupportedOperationException("log");
+                Helper.printLog();
             }
 
             case "global-log" -> {
@@ -126,6 +148,11 @@ public class Main {
                 throw new UnsupportedOperationException("reset");
             }
 
+            case "test" -> {
+                log.debug("just for test");
+                sc = Helper.getStatus();
+                
+            }
             // TODO: handler merge command
             default -> {
                 log.debug("unidentified command");
