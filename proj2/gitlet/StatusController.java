@@ -90,7 +90,7 @@ public class StatusController implements Serializable {
             log.debug("%s", stagedFile);
         } else {
             // TODO return failure if the file is not exist
-            throw new UnsupportedOperationException();
+            exitProgramWithMessage("File does not exist.");
         }
     }
 

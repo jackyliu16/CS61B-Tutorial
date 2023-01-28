@@ -225,4 +225,9 @@ public class Helper {
         File commitFile = Utils.join(REPO, COMMIT_FOLDER, commitName);
         return commitFile.exists() ? Utils.readObject(commitFile, Commit.class) : null;
     }
+
+    public static void exitProgramWithMessage(String message) {
+        System.out.println(message);
+        System.exit(0);
+    }
 }

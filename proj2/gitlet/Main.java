@@ -48,7 +48,7 @@ public class Main {
                 log.debug("add command");
                 exitIfNotGitLetDirectory();
                 sc = Helper.getStatus();
-                if (args.length < 1) {
+                if (args.length != 2) {
                     System.out.println("Incorrect operands.");
                     System.exit(0);
                 }
@@ -103,13 +103,16 @@ public class Main {
                     // 2. if the file exist in the commit, just copy it and overwrite the file in the work directory
                     if (!Objects.equals(args[2], "--")) exitProgramWithMessage("Incorrect operands.");
                     File commitFile = Utils.join(REPO, COMMIT_FOLDER, args[1]);
+                    log.debug(commitFile);
                     if (!commitFile.exists()) exitProgramWithMessage("No commit with that id exists.");
                     Commit commit = Utils.readObject(commitFile, Commit.class);
-                    String hash = commit.getFileHashIfExist(args[2]);
+                    log.debug(commit);
+                    String hash = commit.getFileHashIfExist(args[3]);
+                    log.debug(hash);
                     if (hash == null) exitProgramWithMessage("File does not exist in that commit.");
                     // just copy the file in the blob folder into the place ?
                     File original = Utils.join(REPO, BLOB_FOLDER, hash);
-                    File destination = Utils.join(CWD, hash);
+                    File destination = Utils.join(CWD, args[3]);    // the copy dest is the fileName
                     try {
                         Helper.copyFile(original, destination);
                     } catch (IOException e) {
@@ -214,8 +217,4 @@ public class Main {
         return gitLetDirectly.exists();
     }
 
-    private static void exitProgramWithMessage(String message) {
-        System.out.println(message);
-        System.exit(0);
-    }
 }
