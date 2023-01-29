@@ -64,7 +64,9 @@ public class Branch implements Serializable {
         // create a branch
         Branch newBranch = new Branch(branchName, this.commit);
         File branchFile = Utils.join(REPO, BRANCH_FOLDER, branchName);
+        log.debug(newBranch);
+        log.debug(branchFile);
         // save the branch
-        Helper.saveContentInFile(branchFile, Utils.serialize(newBranch));
+        Helper.saveContentInFile(branchFile, newBranch);
     }
 }

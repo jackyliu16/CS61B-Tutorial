@@ -20,13 +20,13 @@ public class Main {
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
     public static void main(String[] args) {
-        log.setLogLevel(LogLevel.OFF);
+        log.setLogLevel(LogLevel.Debug);
         log.info("========== NEXT OPERATION %s ==========", args[0]);
 
         // if args is empty
         if (args.length == 0) {
             // NOTE ERR 01: If a user doesn’t input any arguments, print the message and exit
-            System.out.println("Please enter a command.");
+            System.out.println("Please enter     a command.");
             System.exit(0);
         }
 
@@ -116,22 +116,26 @@ public class Main {
                         log.error("IOException");
                     }
                 } else {
-                    // checkout [branch name]
+                    log.info("checkout [branch name]");
+                    log.info("checkout %s %s", args[0], args[1]);
                     if (args.length != 2) exitProgramWithMessage("Incorrect operands.");
                     // first check if the name is the branch
 //                  BC we need to compare if the branch is current branch thus we not using Branch branch = Helper.getBranchIfExist(args[1]);
-                    if (Objects.equals(getCurrent().getName(), args[2])) exitProgramWithMessage("No need to checkout the current branch.");
+                    if (Objects.equals(getCurrent().getName(), args[1])) exitProgramWithMessage("No need to checkout the current branch.");
                     List<String> branchNames = Utils.plainFilenamesIn(Utils.join(REPO, BRANCH_FOLDER));
                     if (branchNames == null || branchNames.isEmpty()) exitProgramWithMessage("No such branch exists.");
                     // BC the name of the branchFile is the branch name
-                    Branch branch;
+                    assert branchNames != null;
                     if (branchNames.contains(args[1])) {
                         File branchFile = Utils.join(REPO, BRANCH_FOLDER, args[1]);
-                        branch = Utils.readObject(branchFile, Branch.class);
+                        if (!branchFile.exists()) log.error("branch file not exist(shouldn't happen)");
+                        Branch branch = Utils.readObject(branchFile, Branch.class);
+                        if (branch == null) log.error("branch is null");
+                        assert branch != null;
+                        branch.getLatestCommit().resetFileOnTheCommitToWorkDirectory();
                     } else {
                         exitProgramWithMessage("No such branch exists.");
                     }
-                    // TODO finish the copy all file from branch
                 }
             }
 
@@ -186,10 +190,24 @@ public class Main {
                 throw new UnsupportedOperationException("reset");
             }
 
+            // TODO remove this
             case "test" -> {
-                log.debug("just for test");
-                sc = Helper.getStatus();
-                
+                // print the file info of the latest commit in the branch
+                log.setLogLevel(LogLevel.Trace);
+                Branch branch = Helper.getCurrent();
+                List<String> branchFiles = Utils.plainFilenamesIn(Utils.join(REPO, BRANCH_FOLDER));
+                System.out.println(branch);
+                if (branchFiles != null) {
+                    for (String branchFile: branchFiles) {
+                        File file = Utils.join(REPO, BRANCH_FOLDER, branchFile);
+                        Branch theBranch = Utils.readObject(file, Branch.class);
+                        System.out.println(theBranch);
+                    }
+                }
+                Commit commit = branch.getLatestCommit();
+                log.info(commit);
+                // get the mapping info of it
+                log.info(commit.mapping);
             }
             // TODO: handler merge command
             default -> {

@@ -24,8 +24,11 @@ public class Test {
     public static void main(String[] args) throws IOException {
         log.setLogLevel(LogLevel.Trace);
 
-        boolean isMatch = Pattern.matches("[a-f0-9]{40}", args[0]);
-        System.out.println(isMatch);
+        File file = Utils.join(REPO, BRANCH_FOLDER, "newBranch");
+//        System.out.println(Utils.readObject(file, Branch.class));
+        Branch branch = Utils.readObject(file, Branch.class);
+        System.out.println(branch);
+        System.out.println(file);
     }
 }
 

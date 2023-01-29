@@ -75,13 +75,15 @@ public class Commit implements Serializable {
     public List<String> ifFileHasChange() {
         ArrayList<String> res = new ArrayList<>();
         for (String name: mapping.keySet()) {
-            File file = Utils.join(REPO, BLOB_FOLDER, name);
+            String fileHash = mapping.get(name);
+            File file = Utils.join(REPO, BLOB_FOLDER, fileHash);
             try {
-                if (Objects.equals(mapping.get(name), Utils.sha1(Files.readAllBytes(file.toPath())))) {
+                if (Objects.equals(mapping.get(fileHash), Utils.sha1((Object) Files.readAllBytes(file.toPath())))) {
                     res.add(name);
                 }
             } catch (IOException e) {
                 log.error("IOException");
+                e.printStackTrace();
             }
         }
         log.debug("ifFileHasChange: %s", res.toString());
@@ -99,6 +101,22 @@ public class Commit implements Serializable {
     public String getFileHashIfExist(String fileName) {
         return mapping.get(fileName);
     }
+
+    public void resetFileOnTheCommitToWorkDirectory() {
+        // get the diff file from commit
+        List<String> changeFile = ifFileHasChange();
+
+        for (String fileName: changeFile) {
+            File origin = Utils.join(REPO, BLOB_FOLDER, getFileHashIfExist(fileName));
+            File destination = Utils.join(CWD, fileName);
+            try {
+                copyFile(origin, destination);
+            } catch (IOException e) {
+                log.error("IOException");
+            }
+        }
+    }
+
 
     public String toString() {
         return String.format(
