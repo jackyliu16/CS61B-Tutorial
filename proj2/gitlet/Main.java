@@ -102,10 +102,7 @@ public class Main {
                     // 1. check if the commit exist
                     // 2. if the file exist in the commit, just copy it and overwrite the file in the work directory
                     if (!Objects.equals(args[2], "--")) exitProgramWithMessage("Incorrect operands.");
-                    File commitFile = Utils.join(REPO, COMMIT_FOLDER, args[1]);
-                    log.debug(commitFile);
-                    if (!commitFile.exists()) exitProgramWithMessage("No commit with that id exists.");
-                    Commit commit = Utils.readObject(commitFile, Commit.class);
+                    Commit commit = Helper.getCommitIfExist(args[1]);
                     log.debug(commit);
                     String hash = commit.getFileHashIfExist(args[3]);
                     log.debug(hash);

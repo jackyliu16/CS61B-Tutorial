@@ -220,9 +220,11 @@ public class Helper {
         }
     }
 
-    public static Commit getCommitIfExist(String commitName) {
-        File commitFile = Utils.join(REPO, COMMIT_FOLDER, commitName);
-        return commitFile.exists() ? Utils.readObject(commitFile, Commit.class) : null;
+    public static Commit getCommitIfExist(String commitHash) {
+        File commitFile = Utils.join(REPO, COMMIT_FOLDER, commitHash);
+        if (!commitFile.exists()) exitProgramWithMessage("No commit with that id exists.");
+        return Utils.readObject(commitFile, Commit.class);
+//        return commitFile.exists() ? Utils.readObject(commitFile, Commit.class) : null;
     }
 
     public static void exitProgramWithMessage(String message) {
