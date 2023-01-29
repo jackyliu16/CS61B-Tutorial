@@ -207,7 +207,7 @@ public class Main {
                 Commit commit = branch.getLatestCommit();
                 log.info(commit);
                 // get the mapping info of it
-                log.info(commit.mapping);
+                log.info(commit.getMapping());
             }
             // TODO: handler merge command
             default -> {

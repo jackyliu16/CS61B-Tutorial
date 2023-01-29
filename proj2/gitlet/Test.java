@@ -12,6 +12,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.sql.SQLOutput;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.regex.*;
 
 import static gitlet.Helper.*;
@@ -23,12 +24,24 @@ public class Test {
     static final File TEST_FOLDER = Utils.join(CWD, "test");
     public static void main(String[] args) throws IOException {
         log.setLogLevel(LogLevel.Trace);
+//
+//        File file = Utils.join(REPO, BRANCH_FOLDER, "newBranch");
+////        System.out.println(Utils.readObject(file, Branch.class));
+//        Branch branch = Utils.readObject(file, Branch.class);
+//        System.out.println(branch);
+//        System.out.println(file);
 
-        File file = Utils.join(REPO, BRANCH_FOLDER, "newBranch");
-//        System.out.println(Utils.readObject(file, Branch.class));
-        Branch branch = Utils.readObject(file, Branch.class);
-        System.out.println(branch);
-        System.out.println(file);
+        // 创建一个 hashmap
+        HashMap<String, Integer> primeNumbers = new HashMap<>();
+        primeNumbers.put("Two", 2);
+        primeNumbers.put("Three", 3);
+        primeNumbers.put("Five", 5);
+
+        // 输出clone()方法的返回值
+        System.out.println("Return value of clone(): " + primeNumbers.clone());
+        primeNumbers.put("same", 3);
+        System.out.println("Numbers: " + primeNumbers);
+        System.out.println("Return value of clone(): " + primeNumbers.clone());
     }
 }
 

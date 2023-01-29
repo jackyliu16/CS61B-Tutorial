@@ -27,7 +27,7 @@ public class Commit implements Serializable {
     String logMessage;
 //    Timestamp timestamp;
     Date date;
-    HashMap<String, String> mapping;
+    private HashMap<String, String> mapping;
     Commit prev;
 
     public Commit(boolean logFlag) {
@@ -53,6 +53,7 @@ public class Commit implements Serializable {
     public static Commit appendCommit(Commit commit, boolean logFlag, String message) {
         Commit newCommit = new Commit(message, false);
         newCommit.prev = commit;
+        newCommit.mapping = new HashMap<>(commit.mapping);
         if (logFlag) newCommit.log();
         return newCommit;
     }
@@ -117,6 +118,14 @@ public class Commit implements Serializable {
         }
     }
 
+    public void addKeyValueMapping(String fileName, String hash) {
+        this.mapping.put(fileName, hash);
+    }
+
+    // TODO only using for debug: remove !!!
+    public HashMap<String, String> getMapping() {
+        return mapping;
+    }
 
     public String toString() {
         return String.format(

@@ -153,7 +153,8 @@ public class StatusController implements Serializable {
             log.info("\nrename\n\t%s into \n\t%s", in, out);
             log.debug(stagedFile.get(fileName));
             log.debug("\n%s", newCom);
-            newCom.mapping.put(fileName, stagedFile.get(fileName)); // add the map between blob and file path
+//            newCom.mapping.put(fileName, stagedFile.get(fileName)); // add the map between blob and file path
+            newCom.addKeyValueMapping(fileName, stagedFile.get(fileName));
         }
 
         // clear cache
