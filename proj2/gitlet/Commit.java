@@ -77,7 +77,8 @@ public class Commit implements Serializable {
         ArrayList<String> res = new ArrayList<>();
         for (String name: mapping.keySet()) {
             String fileHash = mapping.get(name);
-            File file = Utils.join(REPO, BLOB_FOLDER, fileHash);
+            File file = Utils.join(CWD, name);
+//            File file = Utils.join(REPO, BLOB_FOLDER, fileHash);
             try {
                 log.debug(fileHash);
                 log.debug(Utils.sha1(Files.readAllBytes(file.toPath())));

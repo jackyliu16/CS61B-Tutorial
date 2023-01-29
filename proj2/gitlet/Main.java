@@ -206,10 +206,25 @@ public class Main {
                         System.out.println(theBranch);
                     }
                 }
-                Commit commit = branch.getLatestCommit();
-                log.info(commit);
-                // get the mapping info of it
-                log.info(commit.getMapping());
+                Commit p = branch.getLatestCommit();
+//                System.out.printf("%s: %s", Utils.sha1(Utils.serialize(p)).substring(0, 7), p.getMapping());
+//                p = p.prev;
+//                System.out.printf("%s: %s", Utils.sha1(Utils.serialize(p)).substring(0, 7), p.getMapping());
+//                p = p.prev;
+//                System.out.printf("%s: %s", Utils.sha1(Utils.serialize(p)).substring(0, 7), p.getMapping());
+//                p = p.prev;
+                while (p != null) {
+                    System.out.printf("%s: %s\n", Utils.sha1(Utils.serialize(p)).substring(0, 7), p.getMapping());
+                    p = p.prev;
+                }
+
+//                for (Commit p = branch.getLatestCommit(); p == null; p = p.prev) {
+//                    System.out.printf("%s: %s", Utils.sha1(Utils.serialize(p)).substring(0, 7), p.getMapping());
+//                }
+//                Commit commit = branch.getLatestCommit();
+//                log.info(commit);
+//                // get the mapping info of it
+//                log.info(commit.getMapping());
             }
 
             // TODO will only been using in debug operation
