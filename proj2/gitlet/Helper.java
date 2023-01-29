@@ -74,24 +74,6 @@ public class Helper {
         log.debug("the init repository has %s", flag? "complete": "failure");
     }
 
-    public static void saveContentInFile(File file, Serializable data) {
-        // if repetition then overwrite else create
-        if (file.exists() && file.isFile()) {
-            // overwrite data
-            Utils.writeObject(file, data);
-        } else {
-            // create file and write the content
-            assert !file.exists();
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                log.error("IOException when create file %s", file);
-            }
-            assert file.exists();
-            Utils.writeObject(file, data);
-        }
-    }
-
     public static void addContentIntoLog(String message) {
         log.info("addContentIntoLog");
         File logFile = Utils.join(REPO, CACHE_FOLDER, LOG_FILE);
@@ -115,6 +97,7 @@ public class Helper {
 //        Utils.writeContents(logFile, message);
     }
 
+
     public static Branch getCurrent() {
         File head = Utils.join(REPO, CACHE_FOLDER, HEAD_FILE);
         // if file not exist -> error
@@ -137,23 +120,48 @@ public class Helper {
         return Utils.readObject(head, StatusController.class);
     }
 
+    public static void saveContentInFile(File file, Serializable data) {
+        // if repetition then overwrite else create
+        if (file.exists() && file.isFile()) {
+            // overwrite data
+            Utils.writeObject(file, data);
+        } else {
+            // create file and write the content
+            assert !file.exists();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                log.error("IOException when create file %s", file);
+            }
+            assert file.exists();
+            Utils.writeObject(file, data);
+        }
+    }
+
     public static void saveStatus(StatusController sc) {
         File scLocation = Utils.join(REPO, CACHE_FOLDER, STATUS_FILE);
         saveContentInFile(scLocation, sc);
     }
 
+    /**
+     * save the current branch in branch folder and set the input branch as current branch
+     * @param branch the branch you want to set as current branch.
+     */
+    public static void saveCurrentAndSetAsSpecBranch(Branch branch) {
+        Branch current = getCurrent();
+        File currentSave = Utils.join(REPO, BRANCH_FOLDER, current.getName());
+        saveContentInFile(currentSave, current);
+        File origin = Utils.join(REPO, BRANCH_FOLDER, branch.getName());
+        File destination = Utils.join(REPO, CACHE_FOLDER, HEAD_FILE);
+        origin.renameTo(destination);
+        assert getCurrent().getName().equals(branch.getName());
+    }
+
+    @Deprecated
     public static void printLog() {
         File logFile = Utils.join(REPO, CACHE_FOLDER, LOG_FILE);
         String str = Utils.readContentsAsString(logFile);
         System.out.println(str);
-    }
-    /** TODO convertAndSaveFile
-     * Will Copy the File from work directory to blob directory, with a hash as it's file name
-     * NOTE if it's contains a directory that will create a tree node to Save the message
-     * @param fileName the file path (relative address) that you want to save to the directory
-     */
-    void convertAndSaveFile(String fileName) {
-
     }
 
     /**
@@ -232,4 +240,5 @@ public class Helper {
         System.out.println(message);
         System.exit(0);
     }
+
 }

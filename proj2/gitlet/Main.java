@@ -21,7 +21,7 @@ public class Main {
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
     public static void main(String[] args) {
-        log.setLogLevel(LogLevel.Debug);
+        log.setLogLevel(LogLevel.OFF);
         log.info("========== NEXT OPERATION %s ==========", args[0]);
 
         // if args is empty
@@ -128,16 +128,21 @@ public class Main {
                     if (branchNames == null || branchNames.isEmpty()) exitProgramWithMessage("No such branch exists.");
                     // BC the name of the branchFile is the branch name
                     assert branchNames != null;
+                    Branch branch = null;
                     if (branchNames.contains(args[1])) {
                         File branchFile = Utils.join(REPO, BRANCH_FOLDER, args[1]);
                         if (!branchFile.exists()) log.error("branch file not exist(shouldn't happen)");
-                        Branch branch = Utils.readObject(branchFile, Branch.class);
+                        branch = Utils.readObject(branchFile, Branch.class);
                         if (branch == null) log.error("branch is null");
                         assert branch != null;
                         branch.getLatestCommit().resetFileOnTheCommitToWorkDirectory();
                     } else {
                         exitProgramWithMessage("No such branch exists.");
                     }
+                    // TODO change the current branch to another branch.
+                    if (branch == null) exitProgramWithMessage("No such branch exists.");
+                    assert branch != null;
+                    Helper.saveCurrentAndSetAsSpecBranch(branch);
                 }
             }
 
@@ -162,7 +167,9 @@ public class Main {
 
             case "log" -> {
                 log.debug("log command");
-                Helper.printLog();
+                File logFile = Utils.join(REPO, CACHE_FOLDER, LOG_FILE);
+                String str = Utils.readContentsAsString(logFile);
+                System.out.println(str);
             }
 
             case "global-log" -> {
