@@ -21,7 +21,6 @@ import java.util.Objects;
 import static gitlet.Helper.*;
 
 public class StatusController implements Serializable {
-    static final String SAVE_FILE = "StatusCache";
     static final Logger log = Logger.INSTANCE;
 
     Branch current;
@@ -124,11 +123,21 @@ public class StatusController implements Serializable {
         log.debug("%s", stagedFile);
         log.debug("%s", removedFile);
 
-        if ((stagedFile.isEmpty() && removedFile.isEmpty()) || !newCom.ifFileHasChange().isEmpty()) {
-            log.info("nothing in the stageFile and removedFile ");
-            // TODO nothing to change
-            return;
+//        if ((stagedFile.isEmpty() && removedFile.isEmpty()) || !newCom.ifFileHasChange().isEmpty()) {
+//            log.info("nothing in the stageFile and removedFile ");
+//            // TODO nothing to change
+//            return;
+//        }
+        // if a file which is in the modify file list and not in the stagedFile and removedFile that we should  exit
+        List<String> modifyFiles = newCom.ifFileHasChange();
+        if (!modifyFiles.isEmpty()) {
+            for (String fileName : modifyFiles) {
+                if (!stagedFile.containsKey(fileName) && !removedFile.containsKey(fileName)) {
+                    Helper.exitProgramWithMessage("Modifications Not Staged For Commit.");
+                }
+            }
         }
+
 
         boolean flag = true; // if false than do nothing
         for (String fileName: stagedFile.keySet()) {
