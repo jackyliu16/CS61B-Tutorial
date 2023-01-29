@@ -8,10 +8,10 @@ package gitlet;
  * @Version:0.0
  */
 
+import java.io.File;
 import java.io.Serializable;
 
-import static gitlet.Helper.getCurrent;
-import static gitlet.Helper.log;
+import static gitlet.Helper.*;
 
 public class Branch implements Serializable {
     static final String DEFAULT_REPO_NAME = "master";
@@ -21,6 +21,11 @@ public class Branch implements Serializable {
     public Branch() {
         this.name = DEFAULT_REPO_NAME;
         this.commit = new Commit(true);
+    }
+
+    public Branch(String name, Commit commit) {
+        this.name = name;
+        this.commit = commit;
     }
 
     public String getName() {
@@ -53,5 +58,13 @@ public class Branch implements Serializable {
             );
             return "";
         }
+    }
+
+    public void baseOnItCreateANewBranch(String branchName) {
+        // create a branch
+        Branch newBranch = new Branch(branchName, this.commit);
+        File branchFile = Utils.join(REPO, BRANCH_FOLDER, branchName);
+        // save the branch
+        Helper.saveContentInFile(branchFile, Utils.serialize(newBranch));
     }
 }

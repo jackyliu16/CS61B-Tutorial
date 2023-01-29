@@ -174,7 +174,9 @@ public class Main {
 
             case "branch" -> {
                 log.debug("branch command");
-                throw new UnsupportedOperationException("branch");
+                if (args.length != 2) exitProgramWithMessage("Incorrect operands.");
+                if (Helper.getBranchIfExist(args[1]) != null) exitProgramWithMessage("A branch with that name already exists.");
+                getCurrent().baseOnItCreateANewBranch(args[1]);
             }
 
             case "rm-branch" -> {

@@ -198,7 +198,6 @@ public class Helper {
      * @param branchName the branch name you want to get
      * @return a branch class or null (if you couldn't found a branch name branchName)
      */
-    @Deprecated
     public static Branch getBranchIfExist(String branchName) {
         // check HEAD
         File head = Utils.join(REPO, CACHE_FOLDER, HEAD_FILE);
