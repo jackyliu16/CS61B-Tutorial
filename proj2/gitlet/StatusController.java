@@ -241,12 +241,10 @@ public class StatusController implements Serializable {
             }
         }
 
-        // TODO provide the removed files
-        // TODO provide the Modifications Not Staged From Commit 
-        // TODO provide Untracked Files
         sb.append("\n").append("=== Modifications Not Staged For Commit ===").append("\n");
         // check all staged file if it has been change
-        List<String> modificationList = getCurrent().commit.ifFileHasChange();
+        List<String> modificationList = getCurrent().getLatestCommit().ifFileHasChange();
+        log.debug(modificationList);
         if (!modificationList.isEmpty()) {
             for (String str: modificationList) {
                 sb.append(str).append("\n");

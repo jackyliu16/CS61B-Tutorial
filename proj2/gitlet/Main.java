@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.*;
@@ -115,6 +116,7 @@ public class Main {
                     } catch (IOException e) {
                         log.error("IOException");
                     }
+
                 } else {
                     log.info("checkout [branch name]");
                     log.info("checkout %s %s", args[0], args[1]);
@@ -208,6 +210,16 @@ public class Main {
                 log.info(commit);
                 // get the mapping info of it
                 log.info(commit.getMapping());
+            }
+
+            // TODO will only been using in debug operation
+            case "hash" -> {
+                File file = Utils.join(CWD, args[1]);
+                try {
+                    System.out.println(Utils.sha1((Object) Files.readAllBytes(file.toPath())));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
             // TODO: handler merge command
             default -> {

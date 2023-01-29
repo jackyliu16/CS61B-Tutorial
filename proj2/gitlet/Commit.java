@@ -79,7 +79,7 @@ public class Commit implements Serializable {
             String fileHash = mapping.get(name);
             File file = Utils.join(REPO, BLOB_FOLDER, fileHash);
             try {
-                if (Objects.equals(mapping.get(fileHash), Utils.sha1((Object) Files.readAllBytes(file.toPath())))) {
+                if (Objects.equals(fileHash, Utils.sha1((Object) Files.readAllBytes(file.toPath())))) {
                     res.add(name);
                 }
             } catch (IOException e) {
