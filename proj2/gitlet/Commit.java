@@ -75,9 +75,14 @@ public class Commit implements Serializable {
             String fileHash = mapping.get(name);
             File file = Utils.join(CWD, name);
 //            File file = Utils.join(REPO, BLOB_FOLDER, fileHash);
+            if (!file.exists()) {
+                // if the file not exist that just push into array
+                res.add(name);
+                continue;
+            }
             try {
                 log.debug(fileHash);
-                log.debug(Utils.sha1(Files.readAllBytes(file.toPath())));
+                log.debug(Utils.sha1((Object) Files.readAllBytes(file.toPath())));
                 if (!Objects.equals(fileHash, Utils.sha1((Object) Files.readAllBytes(file.toPath())))) {
                     res.add(name);
                 }
@@ -120,6 +125,8 @@ public class Commit implements Serializable {
     public void addKeyValueMapping(String fileName, String hash) {
         this.mapping.put(fileName, hash);
     }
+
+    public void removeKeyValueMapping(String fileName, String hash) { this.mapping.remove(fileName, hash); }
 
     // TODO only using for debug: remove !!!
     public HashMap<String, String> getMapping() {
