@@ -125,6 +125,7 @@ public class Main {
                     if (Objects.equals(getCurrent().getName(), args[1])) exitProgramWithMessage("No need to checkout the current branch.");
                     List<String> branchNames = Utils.plainFilenamesIn(Utils.join(REPO, BRANCH_FOLDER));
                     if (branchNames == null || branchNames.isEmpty()) exitProgramWithMessage("No such branch exists.");
+                    log.debug("branch list: %s", branchNames);
                     // BC the name of the branchFile is the branch name
                     assert branchNames != null;
                     Branch branch = null;
@@ -134,6 +135,11 @@ public class Main {
                         branch = Utils.readObject(branchFile, Branch.class);
                         if (branch == null) log.error("branch is null");
                         assert branch != null;
+                        // If a working file is untracked in the current branch and
+                        // would be overwritten by the checkout, print There is an
+                        // untracked file in the way; delete it, or add and commit it first.
+                        sc = getStatus();
+                        sc.checkOutAllFileInBranch(branch);
                         branch.getLatestCommit().resetFileOnTheCommitToWorkDirectory();
                     } else {
                         exitProgramWithMessage("No such branch exists.");

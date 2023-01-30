@@ -107,6 +107,7 @@ public class Commit implements Serializable {
         return mapping.get(fileName);
     }
 
+    @Deprecated // BC the need of compare the file and stageFile, removedFIle
     public void resetFileOnTheCommitToWorkDirectory() {
         // get the diff file from commit
         List<String> changeFile = ifFileHasChange();
@@ -127,6 +128,10 @@ public class Commit implements Serializable {
     }
 
     public void removeKeyValueMapping(String fileName, String hash) { this.mapping.remove(fileName, hash); }
+
+    public boolean checkIfKeyExistInMapping(String fileName) {
+        return mapping.containsKey(fileName);
+    }
 
     // TODO only using for debug: remove !!!
     public HashMap<String, String> getMapping() {

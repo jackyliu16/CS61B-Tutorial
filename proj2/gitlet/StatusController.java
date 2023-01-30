@@ -252,6 +252,28 @@ public class StatusController implements Serializable {
         }
     }
 
+    public void checkOutAllFileInBranch(Branch branch) {
+        List<String> fileNames = branch.getLatestCommit().ifFileHasChange();
+        log.debug(fileNames);
+        // check if there is same file has been change -> reject and exist
+        Branch current = Helper.getCurrent();
+        for (String fileName: fileNames) {
+            log.debug("loop");
+            if (!current.getLatestCommit().checkIfKeyExistInMapping(fileName)) {
+                exitProgramWithMessage("There is an untracked file in the way; delete it, or add and commit it first.");
+            }
+        }
+        for (String fileName: fileNames) {
+            File origin = Utils.join(REPO, BLOB_FOLDER, current.getLatestCommit().getFileHashIfExist(fileName));
+            File destination = Utils.join(CWD, fileName);
+            try {
+                copyFile(origin, destination);
+            } catch (IOException e) {
+                log.error("IOException");
+            }
+        }
+
+    }
     // NOTE: we may need to make up another class to save the information of each file current in the list,
     //  that we could check if the file has been change.
     //  but this action could also be replace by we change the hash each time and make it as the file name
@@ -293,14 +315,15 @@ public class StatusController implements Serializable {
         // print the deleted file
         for (String fileName : getCurrent().getLatestCommit().getMapping().keySet()) {
             File file = Utils.join(CWD, fileName);
-            if (!file.exists()) {
+            if (!file.exists() && !stagedFile.containsKey(fileName) && !removedFile.containsKey(fileName)) {
                 sb.append(fileName).append(" (deleted)").append("\n");
             }
         }
         // print the modified file
         if (!modificationList.isEmpty()) {
-            for (String str: modificationList) {
-                sb.append(str).append(" (modified)").append("\n");
+            for (String name: modificationList) {
+                if (stagedFile.containsKey(name) || removedFile.containsKey(name)) continue;
+                sb.append(name).append(" (modified)").append("\n");
             }
         }
 
