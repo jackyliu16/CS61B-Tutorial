@@ -151,8 +151,13 @@ public class StatusController implements Serializable {
         log.debug("%s", stagedFile);
         log.debug("%s", removedFile);
 
+
         // if a file which is in the modify file list and not in the stagedFile and removedFile that we should  exit
         List<String> modifyFiles = newCom.ifFileHasChange();
+
+        if (stagedFile.isEmpty() && removedFile.isEmpty() && modifyFiles.isEmpty()) {
+            exitProgramWithMessage("No changes added to the commit.");
+        }
         if (!modifyFiles.isEmpty()) {
             for (String fileName : modifyFiles) {
                 if (!stagedFile.containsKey(fileName) && !removedFile.containsKey(fileName)) {
