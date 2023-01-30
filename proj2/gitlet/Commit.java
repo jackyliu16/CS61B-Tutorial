@@ -81,8 +81,6 @@ public class Commit implements Serializable {
                 continue;
             }
             try {
-                log.debug(fileHash);
-                log.debug(Utils.sha1((Object) Files.readAllBytes(file.toPath())));
                 if (!Objects.equals(fileHash, Utils.sha1((Object) Files.readAllBytes(file.toPath())))) {
                     res.add(name);
                 }

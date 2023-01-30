@@ -53,11 +53,18 @@ public class StatusController implements Serializable {
             }
             log.debug("hash %s", hash);
 
+            // if the fileName is in the removedFile list
+            log.debug("fileName: %s", fileName);
+            if (removedFile.containsKey(fileName)) {
+                removedFile.remove(fileName);
+            }
+
             // nothing change since the latest commit
             if (getCurrent().commit.checkIfSame(fileName, hash)) {
                 log.info("the add file is as same as the file in the latest commit");
                 return;
             }
+
 
             // if the file path in mapping, compare the hash from mapping and collect this time.
             if (stagedFile.containsKey(fileName) && Objects.equals(stagedFile.get(fileName), hash)) {
