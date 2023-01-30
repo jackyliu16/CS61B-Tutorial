@@ -21,13 +21,13 @@ public class Main {
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
     public static void main(String[] args) {
-        log.setLogLevel(LogLevel.OFF);
+        log.setLogLevel(LogLevel.Debug);
         log.info("========== NEXT OPERATION %s ==========", args[0]);
 
         // if args is empty
         if (args.length == 0) {
             // NOTE ERR 01: If a user doesn’t input any arguments, print the message and exit
-            System.out.println("Please enter     a command.");
+            System.out.println("Please enter a command.");
             System.exit(0);
         }
 
@@ -116,7 +116,6 @@ public class Main {
                     } catch (IOException e) {
                         log.error("IOException");
                     }
-
                 } else {
                     log.info("checkout [branch name]");
                     log.info("checkout %s %s", args[0], args[1]);
@@ -150,6 +149,7 @@ public class Main {
             case "merge" -> {
                 log.debug("merge command");
                 exitIfNotGitLetDirectory();
+                throw new UnsupportedOperationException();
             }
 
             // TODO: handler status command;
@@ -161,8 +161,14 @@ public class Main {
             }
 
             case "rm" -> {
+                // java gitlet.Main rm [file name]
                 log.debug("rm command");
-                throw new UnsupportedOperationException("rm");
+                // if stage for addition then remove
+                // if in the track of current commit then stage it for remove and remove from work directory
+                // if the file haven't been addition and haven't track in the haed commit. -> No reason to remove the file.
+                sc = getStatus();
+                sc.deleteFile(args[1]);
+                Helper.saveStatus(sc);
             }
 
             case "log" -> {
@@ -191,7 +197,15 @@ public class Main {
 
             case "rm-branch" -> {
                 log.debug("rm-branch command");
-                throw new UnsupportedOperationException("rm-branch");
+                if (Objects.equals(getCurrent().getName(), args[1])) exitProgramWithMessage("Cannot remove the current branch.");
+                Branch branch = Helper.getBranchIfExist(args[1]);
+                if (branch == null) exitProgramWithMessage("A branch with that name does not exist.");
+                assert branch != null;
+                // BC the Utils.restrictedDelete .gitlet info error -> we only using our operation
+                File branchFile = Utils.join(REPO, BRANCH_FOLDER, branch.getName());
+                if (!branchFile.exists()) exitProgramWithMessage("A branch with that name does not exist.");
+                if (branchFile.isDirectory()) log.error("branch file is directory");
+                branchFile.delete();
             }
 
             case "reset" -> {
@@ -214,12 +228,6 @@ public class Main {
                     }
                 }
                 Commit p = branch.getLatestCommit();
-//                System.out.printf("%s: %s", Utils.sha1(Utils.serialize(p)).substring(0, 7), p.getMapping());
-//                p = p.prev;
-//                System.out.printf("%s: %s", Utils.sha1(Utils.serialize(p)).substring(0, 7), p.getMapping());
-//                p = p.prev;
-//                System.out.printf("%s: %s", Utils.sha1(Utils.serialize(p)).substring(0, 7), p.getMapping());
-//                p = p.prev;
                 while (p != null) {
                     System.out.printf("%s: %s\n", Utils.sha1(Utils.serialize(p)).substring(0, 7), p.getMapping());
                     p = p.prev;

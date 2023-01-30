@@ -56,7 +56,6 @@ public class StatusController implements Serializable {
             // nothing change since the latest commit
             if (getCurrent().commit.checkIfSame(fileName, hash)) {
                 log.info("the add file is as same as the file in the latest commit");
-
                 return;
             }
 
@@ -94,12 +93,41 @@ public class StatusController implements Serializable {
     }
 
     /**
-     * Add a file into removeFile
-     * 1. TODO To be improved
-     * @param fileName
+     * just add a file into removeFile
+     * @param fileName the file name you want do delete
      */
     public void deleteFile(String fileName) {
+        boolean flag = false;
+        // if stage for addition then remove
+        if (stagedFile.containsKey(fileName)) {
+            log.debug("file in stagedFile");
+            flag = true;
+            stagedFile.remove(fileName);
+            try {
+                File file = Utils.join(REPO, CACHE_FOLDER, Utils.sha1((Object) Files.readAllBytes(Utils.join(CWD, fileName).toPath())));
+                assert file.exists();
+                file.delete();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
+        // if in the track of current commit then stage it for remove and remove from work directory
+        Commit latestCommit = getCurrent().getLatestCommit();
+        if (latestCommit.containsFile(fileName)) {
+            log.debug("file in the latest Commit");
+            assert !flag;
+            flag = true;
+            // TODO if we should not using the hashmap for example we just using arrayList
+            removedFile.put(fileName, latestCommit.getMapping().get(fileName));
+            File file = Utils.join(CWD, fileName);
+            flag = file.delete();
+        }
+
+        // if the file haven't been addition and haven't track in the haed commit. -> No reason to remove the file.
+        if (!flag) {
+            exitProgramWithMessage("No reason to remove the file.");
+        }
     }
 
     /**
@@ -123,11 +151,6 @@ public class StatusController implements Serializable {
         log.debug("%s", stagedFile);
         log.debug("%s", removedFile);
 
-//        if ((stagedFile.isEmpty() && removedFile.isEmpty()) || !newCom.ifFileHasChange().isEmpty()) {
-//            log.info("nothing in the stageFile and removedFile ");
-//            // TODO nothing to change
-//            return;
-//        }
         // if a file which is in the modify file list and not in the stagedFile and removedFile that we should  exit
         List<String> modifyFiles = newCom.ifFileHasChange();
         if (!modifyFiles.isEmpty()) {
@@ -141,12 +164,12 @@ public class StatusController implements Serializable {
 
         boolean flag = true; // if false than do nothing
         for (String fileName: stagedFile.keySet()) {
+            flag = false;
             File in = Utils.join(REPO, CACHE_FOLDER, stagedFile.get(fileName));
             File out = Utils.join(REPO, BLOB_FOLDER, stagedFile.get(fileName));
             // hash same as it's add time
             try {
                 if (in.exists() && !out.exists() && Objects.equals(stagedFile.get(fileName), Utils.sha1((Object) Files.readAllBytes(Utils.join(CWD, fileName).toPath())))) {
-                    flag = false;
                     log.debug("failure when rename cache file into blobs file :\n\t%s\n\t%s", in, out);
                 }
             } catch (IOException e) {
@@ -156,6 +179,7 @@ public class StatusController implements Serializable {
 
         // add all file from stage file into commit
         for (String fileName: stagedFile.keySet()) {
+            flag = false;
             File in = Utils.join(REPO, CACHE_FOLDER, stagedFile.get(fileName));
             File out = Utils.join(REPO, BLOB_FOLDER, stagedFile.get(fileName));
             in.renameTo(out); // TODO should remove assert
@@ -164,6 +188,13 @@ public class StatusController implements Serializable {
             log.debug("\n%s", newCom);
 //            newCom.mapping.put(fileName, stagedFile.get(fileName)); // add the map between blob and file path
             newCom.addKeyValueMapping(fileName, stagedFile.get(fileName));
+        }
+
+        // remove removedFile from commit
+        for (String fileName: removedFile.keySet()) {
+            flag = false;
+            log.error("remove file ?");
+            newCom.removeKeyValueMapping(fileName, removedFile.get(fileName));
         }
 
         // clear cache
@@ -254,9 +285,17 @@ public class StatusController implements Serializable {
         // check all staged file if it has been change
         List<String> modificationList = getCurrent().getLatestCommit().ifFileHasChange();
         log.debug(modificationList);
+        // print the deleted file
+        for (String fileName : getCurrent().getLatestCommit().getMapping().keySet()) {
+            File file = Utils.join(CWD, fileName);
+            if (!file.exists()) {
+                sb.append(fileName).append(" (deleted)").append("\n");
+            }
+        }
+        // print the modified file
         if (!modificationList.isEmpty()) {
             for (String str: modificationList) {
-                sb.append(str).append("\n");
+                sb.append(str).append(" (modified)").append("\n");
             }
         }
 
