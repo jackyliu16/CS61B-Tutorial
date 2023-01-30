@@ -30,18 +30,9 @@ public class Test {
 //        Branch branch = Utils.readObject(file, Branch.class);
 //        System.out.println(branch);
 //        System.out.println(file);
-
-        // 创建一个 hashmap
-        HashMap<String, Integer> primeNumbers = new HashMap<>();
-        primeNumbers.put("Two", 2);
-        primeNumbers.put("Three", 3);
-        primeNumbers.put("Five", 5);
-
-        // 输出clone()方法的返回值
-        System.out.println("Return value of clone(): " + primeNumbers.clone());
-        primeNumbers.put("same", 3);
-        System.out.println("Numbers: " + primeNumbers);
-        System.out.println("Return value of clone(): " + primeNumbers.clone());
+        File file = Utils.join(CWD, "a.txt");
+        assert file.exists();
+        file.delete();
     }
 }
 

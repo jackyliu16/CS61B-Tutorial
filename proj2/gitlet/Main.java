@@ -21,7 +21,7 @@ public class Main {
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
     public static void main(String[] args) {
-        log.setLogLevel(LogLevel.Debug);
+        log.setLogLevel(LogLevel.OFF);
         log.info("========== NEXT OPERATION %s ==========", args[0]);
 
         // if args is empty
