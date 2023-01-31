@@ -69,6 +69,11 @@ public class Commit implements Serializable {
         Utils.writeObject(file, this);
     }
 
+    /**
+     * check if the file has change since the latest commit
+     * will not check the file which is not exist(been delete)
+     * @return the file name list which
+     */
     public List<String> ifFileHasChange() {
         ArrayList<String> res = new ArrayList<>();
         for (String name: mapping.keySet()) {
@@ -77,7 +82,6 @@ public class Commit implements Serializable {
 //            File file = Utils.join(REPO, BLOB_FOLDER, fileHash);
             if (!file.exists()) {
                 // if the file not exist that just push into array
-                res.add(name);
                 continue;
             }
             try {
@@ -90,6 +94,21 @@ public class Commit implements Serializable {
             }
         }
         log.debug("ifFileHasChange: %s", res.toString());
+        return res;
+    }
+
+    /**
+     * only checking if the file in the commit has been deleted
+     * @return a list of file which has been deleted since the last change.
+     */
+    public List<String> ifFileHasDeleted() {
+        ArrayList<String> res = new ArrayList<>();
+        for (String fileName : this.mapping.keySet()) {
+            File file = Utils.join(CWD, fileName);
+            if (!file.exists()) {
+                res.add(fileName);
+            }
+        }
         return res;
     }
 

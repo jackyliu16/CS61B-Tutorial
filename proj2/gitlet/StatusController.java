@@ -26,7 +26,6 @@ public class StatusController implements Serializable {
     Branch current;
     HashMap<String, String> stagedFile = new HashMap<>();
     HashMap<String, String> removedFile = new HashMap<>();
-//    HashMap<String, Long> lastModified = new HashMap<>();   // for all file under the work directory
 
     public StatusController() {
         current = Helper.getCurrent();
@@ -64,7 +63,6 @@ public class StatusController implements Serializable {
                 log.info("the add file is as same as the file in the latest commit");
                 return;
             }
-
 
             // if the file path in mapping, compare the hash from mapping and collect this time.
             if (stagedFile.containsKey(fileName) && Objects.equals(stagedFile.get(fileName), hash)) {
@@ -128,13 +126,11 @@ public class StatusController implements Serializable {
             // TODO if we should not using the hashmap for example we just using arrayList
             removedFile.put(fileName, latestCommit.getMapping().get(fileName));
             File file = Utils.join(CWD, fileName);
-            flag = file.delete();
+            file.delete();
         }
 
         // if the file haven't been addition and haven't track in the haed commit. -> No reason to remove the file.
-        if (!flag) {
-            exitProgramWithMessage("No reason to remove the file.");
-        }
+        if (!flag) exitProgramWithMessage("No reason to remove the file.");
     }
 
     /**
@@ -158,20 +154,38 @@ public class StatusController implements Serializable {
         log.debug("%s", stagedFile);
         log.debug("%s", removedFile);
 
-
         // if a file which is in the modify file list and not in the stagedFile and removedFile that we should  exit
         List<String> modifyFiles = newCom.ifFileHasChange();
+        List<String> deleteFiles = newCom.ifFileHasDeleted();
 
-        if (stagedFile.isEmpty() && removedFile.isEmpty() && modifyFiles.isEmpty()) {
+        // 1. nothing to commit
+        if (stagedFile.isEmpty() && removedFile.isEmpty() && modifyFiles.isEmpty() && deleteFiles.isEmpty()) {
             exitProgramWithMessage("No changes added to the commit.");
         }
-        if (!modifyFiles.isEmpty()) {
-            for (String fileName : modifyFiles) {
-                if (!stagedFile.containsKey(fileName) && !removedFile.containsKey(fileName)) {
-                    Helper.exitProgramWithMessage("Modifications Not Staged For Commit.");
-                }
+
+        // 2. all file modifyFiles or deleteFiles should case error
+        // (all File change not in stagedFile and removedFile should case error)
+        for (String fileName: modifyFiles) {
+            if (!stagedFile.containsKey(fileName) && !removedFile.containsKey(fileName)) {
+                exitProgramWithMessage("Modifications Not Staged For Commit.");
             }
         }
+        for (String fileName: deleteFiles) {
+            if (!stagedFile.containsKey(fileName) && !removedFile.containsKey(fileName)) {
+                exitProgramWithMessage("Modifications Not Staged For Commit.");
+            }
+        }
+//        if (stagedFile.isEmpty() && removedFile.isEmpty() && modifyFiles.isEmpty()) {
+//            exitProgramWithMessage("No changes added to the commit.");
+//        }
+//
+//        if (!modifyFiles.isEmpty()) {
+//            for (String fileName : modifyFiles) {
+//                if (!stagedFile.containsKey(fileName) && !removedFile.containsKey(fileName)) {
+//                    Helper.exitProgramWithMessage("Modifications Not Staged For Commit.");
+//                }
+//            }
+//        }
 
 
         boolean flag = true; // if false than do nothing
@@ -260,9 +274,8 @@ public class StatusController implements Serializable {
     }
 
     public void checkOutAllFileInBranch(Branch branch) {
-        List<String> fileNames = branch.getLatestCommit().ifFileHasChange();
-        log.debug(fileNames);
         // check if there is same file has been change -> reject and exist
+        List<String> fileNames = branch.getLatestCommit().ifFileHasChange();
         Branch current = Helper.getCurrent();
         for (String fileName: fileNames) {
             log.debug("loop");
@@ -270,16 +283,59 @@ public class StatusController implements Serializable {
                 exitProgramWithMessage("There is an untracked file in the way; delete it, or add and commit it first.");
             }
         }
-        for (String fileName: fileNames) {
-            File origin = Utils.join(REPO, BLOB_FOLDER, current.getLatestCommit().getFileHashIfExist(fileName));
-            File destination = Utils.join(CWD, fileName);
-            try {
-                copyFile(origin, destination);
-            } catch (IOException e) {
-                log.error("IOException");
+
+        // 1. delete the file which in current branch but not in that branch
+        Commit latestCommitInBranch = branch.getLatestCommit();
+        Commit latestCommitInCurrent = current.getLatestCommit();
+        HashMap<String, String> branchMap = latestCommitInBranch.getMapping();
+        HashMap<String, String> currentMap = latestCommitInCurrent.getMapping();
+
+        for (String fileName: currentMap.keySet()) {
+            // [remove] if file only exist on current but not in that branch
+            if (!branchMap.containsKey(fileName)) {
+                File file = Utils.join(CWD, fileName);
+                file.delete();
             }
         }
 
+        // a. if the file exist on current and branch
+        for (String fileName: branchMap.keySet()) {
+            if (currentMap.containsKey(fileName)) {
+                if (fileNames.contains(fileName)) {
+                    // [overwrite] if the file has been modified -> overwrite the file from branch into work directory
+                    File original = Utils.join(REPO, BLOB_FOLDER, latestCommitInBranch.getFileHashIfExist(fileName));
+                    File destination = Utils.join(CWD, fileName);
+                    try {
+                        copyFile(original, destination);
+                    } catch (IOException e) {
+                        log.error("IOException");
+                    }
+                } else {
+                    // [nothing] if the file haven't changed
+                    continue;
+                }
+            } else {
+                // [copy] if the file only contains in branch but not contains in the latest commit of current branch
+                File origin = Utils.join(REPO, BLOB_FOLDER, latestCommitInBranch.getFileHashIfExist(fileName));
+                File destination = Utils.join(CWD, fileName);
+                try {
+                    copyFile(origin, destination);
+                } catch (IOException e) {
+                    log.error("IOException");
+                }
+            }
+        }
+
+        // copy the file which only the latest commit
+//        for (String fileName: fileNames) {
+//            File origin = Utils.join(REPO, BLOB_FOLDER, current.getLatestCommit().getFileHashIfExist(fileName));
+//            File destination = Utils.join(CWD, fileName);
+//            try {
+//                copyFile(origin, destination);
+//            } catch (IOException e) {
+//                log.error("IOException");
+//            }
+//        }
     }
     // NOTE: we may need to make up another class to save the information of each file current in the list,
     //  that we could check if the file has been change.
@@ -287,7 +343,6 @@ public class StatusController implements Serializable {
     //  so in this ways i want to using a kind of map like HashMap<String, String>(file path) .
 
     public String toString() {
-        File cacheDir = Utils.join(REPO, CACHE_FOLDER);
         File branchDir = Utils.join(REPO, BRANCH_FOLDER);
 
         StringBuilder sb = new StringBuilder();
@@ -315,23 +370,22 @@ public class StatusController implements Serializable {
             }
         }
 
+        Branch current = getCurrent();
+        Commit commit = current.getLatestCommit();
+
+        List<String> deletedFiles = commit.ifFileHasDeleted();
+        List<String> modifyFiles = commit.ifFileHasChange();
         sb.append("\n").append("=== Modifications Not Staged For Commit ===").append("\n");
-        // check all staged file if it has been change
-        List<String> modificationList = getCurrent().getLatestCommit().ifFileHasChange();
-        log.debug(modificationList);
-        // print the deleted file
-        for (String fileName : getCurrent().getLatestCommit().getMapping().keySet()) {
-            File file = Utils.join(CWD, fileName);
-            if (!file.exists() && !stagedFile.containsKey(fileName) && !removedFile.containsKey(fileName)) {
-                sb.append(fileName).append(" (deleted)").append("\n");
-            }
+
+        // 1. check delete file
+        for (String fileName: deletedFiles) {
+            if (removedFile.containsKey(fileName)) continue;
+            sb.append(fileName).append(" (deleted)").append("\n");
         }
-        // print the modified file
-        if (!modificationList.isEmpty()) {
-            for (String name: modificationList) {
-                if (stagedFile.containsKey(name) || removedFile.containsKey(name)) continue;
-                sb.append(name).append(" (modified)").append("\n");
-            }
+
+        // 2. check modify file
+        for (String fileName: modifyFiles) {
+            sb.append(fileName).append(" (modified)").append("\n");
         }
 
         sb.append("\n").append("=== Untracked Files ===").append("\n");

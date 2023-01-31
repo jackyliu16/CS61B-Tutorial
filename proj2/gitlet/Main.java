@@ -68,11 +68,10 @@ public class Main {
                 // TODO: handle commit [message] command
                 log.debug("commit command");
                 exitIfNotGitLetDirectory();
-                if (args.length > 2) {
-                    // NOTE: in the accusation right now the user will only input one file at the time.
-                    System.out.println("Incorrect operands.");
-                    System.exit(0);
-                }
+
+                if (args.length > 2) exitProgramWithMessage("Please enter a commit message.");
+                if (Objects.equals(args[1], "")) exitProgramWithMessage("Please enter a commit message.");
+
                 sc = Helper.getStatus();
                 sc.commit(args[1]);
                 Helper.saveStatus(sc);
