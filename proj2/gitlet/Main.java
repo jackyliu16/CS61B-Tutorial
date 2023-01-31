@@ -22,14 +22,11 @@ public class Main {
      */
     public static void main(String[] args) {
         log.setLogLevel(LogLevel.OFF);
-        log.info("========== NEXT OPERATION %s ==========", args[0]);
 
         // if args is empty
-        if (args.length == 0) {
-            // NOTE ERR 01: If a user doesn’t input any arguments, print the message and exit
-            System.out.println("Please enter a command.");
-            System.exit(0);
-        }
+        if (args.length == 0) exitProgramWithMessage("Please enter a command.");
+
+        log.info("========== NEXT OPERATION %s ==========", args[0]);
 
         String firstArg = args[0];
         StatusController sc;
@@ -138,8 +135,8 @@ public class Main {
                         // would be overwritten by the checkout, print There is an
                         // untracked file in the way; delete it, or add and commit it first.
                         sc = getStatus();
-                        sc.checkOutAllFileInBranch(branch);
-                        branch.getLatestCommit().resetFileOnTheCommitToWorkDirectory();
+                        sc.checkOutAllFileInCommit(branch.getLatestCommit());
+//                        branch.getLatestCommit().resetFileOnTheCommitToWorkDirectory();
                     } else {
                         exitProgramWithMessage("No such branch exists.");
                     }
@@ -215,7 +212,14 @@ public class Main {
 
             case "reset" -> {
                 log.debug("reset command");
-                throw new UnsupportedOperationException("reset");
+                sc = new StatusController();
+                Commit commit = Helper.getCommitIfExist(args[1]);
+                if (commit == null) exitProgramWithMessage("No commit with that id exists.");
+                sc.checkOutAllFileInCommit(commit);
+                Branch current = getCurrent();
+                current.commit = commit;
+                Helper.saveContentInFile(Utils.join(REPO, CACHE_FOLDER, HEAD_FILE), current);
+//                throw new UnsupportedOperationException("reset");
             }
 
             // TODO remove this

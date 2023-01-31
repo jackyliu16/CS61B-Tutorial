@@ -273,9 +273,9 @@ public class StatusController implements Serializable {
         }
     }
 
-    public void checkOutAllFileInBranch(Branch branch) {
+    public void checkOutAllFileInCommit(Commit commit) {
         // check if there is same file has been change -> reject and exist
-        List<String> fileNames = branch.getLatestCommit().ifFileHasChange();
+        List<String> fileNames = commit.ifFileHasChange();
         Branch current = Helper.getCurrent();
         for (String fileName: fileNames) {
             log.debug("loop");
@@ -285,9 +285,8 @@ public class StatusController implements Serializable {
         }
 
         // 1. delete the file which in current branch but not in that branch
-        Commit latestCommitInBranch = branch.getLatestCommit();
         Commit latestCommitInCurrent = current.getLatestCommit();
-        HashMap<String, String> branchMap = latestCommitInBranch.getMapping();
+        HashMap<String, String> branchMap = commit.getMapping();
         HashMap<String, String> currentMap = latestCommitInCurrent.getMapping();
 
         for (String fileName: currentMap.keySet()) {
@@ -303,7 +302,7 @@ public class StatusController implements Serializable {
             if (currentMap.containsKey(fileName)) {
                 if (fileNames.contains(fileName)) {
                     // [overwrite] if the file has been modified -> overwrite the file from branch into work directory
-                    File original = Utils.join(REPO, BLOB_FOLDER, latestCommitInBranch.getFileHashIfExist(fileName));
+                    File original = Utils.join(REPO, BLOB_FOLDER, commit.getFileHashIfExist(fileName));
                     File destination = Utils.join(CWD, fileName);
                     try {
                         copyFile(original, destination);
@@ -316,7 +315,7 @@ public class StatusController implements Serializable {
                 }
             } else {
                 // [copy] if the file only contains in branch but not contains in the latest commit of current branch
-                File origin = Utils.join(REPO, BLOB_FOLDER, latestCommitInBranch.getFileHashIfExist(fileName));
+                File origin = Utils.join(REPO, BLOB_FOLDER, commit.getFileHashIfExist(fileName));
                 File destination = Utils.join(CWD, fileName);
                 try {
                     copyFile(origin, destination);
