@@ -29,7 +29,6 @@ public class Commit implements Serializable {
     public Commit(boolean logFlag) {
         // will only been call once (by the initial commit)
         logMessage = "initial commit";
-//        timestamp = new Timestamp(-28800000);
         date = new Date(-28800000);
         mapping = new HashMap<>();
         prev = null;
@@ -144,7 +143,9 @@ public class Commit implements Serializable {
         this.mapping.put(fileName, hash);
     }
 
-    public void removeKeyValueMapping(String fileName, String hash) { this.mapping.remove(fileName, hash); }
+    public void removeKeyValueMapping(String fileName, String hash) {
+        this.mapping.remove(fileName, hash);
+    }
 
     public boolean checkIfKeyExistInMapping(String fileName) {
         return mapping.containsKey(fileName);

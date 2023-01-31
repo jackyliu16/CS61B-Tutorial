@@ -34,10 +34,7 @@ public class Main {
         switch (firstArg) {
             case "init" -> {    // finish
                 log.debug("init command");
-                if (ifGitLetDirectoryExists()) {
-                    System.out.println("A Gitlet version-control system already exists in the current directory.");
-                    System.exit(0);
-                }
+                if (ifGitLetDirectoryExists()) exitProgramWithMessage("Not in an initialized Gitlet directory.");
                 Helper.initRepository();
             }
 
@@ -175,14 +172,20 @@ public class Main {
 
             case "log" -> {
                 log.debug("log command");
-                File logFile = Utils.join(REPO, CACHE_FOLDER, LOG_FILE);
-                String str = Utils.readContentsAsString(logFile);
-                System.out.println(str);
+                getCurrent().printLog();
             }
 
             case "global-log" -> {
                 log.debug("global-log command");
-                throw new UnsupportedOperationException("global-log");
+                Branch current = getCurrent();
+                current.printLog();
+
+                File branchFolder = Utils.join(REPO, BRANCH_FOLDER);
+                for (String fileName : Objects.requireNonNull(Utils.plainFilenamesIn(branchFolder))) {
+                    File file = Utils.join(branchFolder, fileName);
+                    Branch branch = Utils.readObject(file, Branch.class);
+                    branch.printLog();
+                }
             }
 
             case "find" -> {
@@ -260,6 +263,7 @@ public class Main {
                     throw new RuntimeException(e);
                 }
             }
+
             // TODO: handler merge command
             default -> {
                 log.debug("unidentified command");

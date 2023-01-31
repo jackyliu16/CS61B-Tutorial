@@ -175,18 +175,6 @@ public class StatusController implements Serializable {
                 exitProgramWithMessage("Modifications Not Staged For Commit.");
             }
         }
-//        if (stagedFile.isEmpty() && removedFile.isEmpty() && modifyFiles.isEmpty()) {
-//            exitProgramWithMessage("No changes added to the commit.");
-//        }
-//
-//        if (!modifyFiles.isEmpty()) {
-//            for (String fileName : modifyFiles) {
-//                if (!stagedFile.containsKey(fileName) && !removedFile.containsKey(fileName)) {
-//                    Helper.exitProgramWithMessage("Modifications Not Staged For Commit.");
-//                }
-//            }
-//        }
-
 
         boolean flag = true; // if false than do nothing
         for (String fileName: stagedFile.keySet()) {
@@ -212,7 +200,6 @@ public class StatusController implements Serializable {
             log.info("\nrename\n\t%s into \n\t%s", in, out);
             log.debug(stagedFile.get(fileName));
             log.debug("\n%s", newCom);
-//            newCom.mapping.put(fileName, stagedFile.get(fileName)); // add the map between blob and file path
             newCom.addKeyValueMapping(fileName, stagedFile.get(fileName));
         }
 

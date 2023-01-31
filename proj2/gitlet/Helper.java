@@ -20,15 +20,14 @@ public class Helper {
     static final String BRANCH_FOLDER = ".branch";
     static final String COMMIT_FOLDER = ".commit";
     static final String CACHE_FOLDER = ".cache";
-    static final String LOG_FILE = "log";
     static final String HEAD_FILE = "HEAD";
     static final String STATUS_FILE = "STATUS";
     static final File CWD = new File(System.getProperty("user.dir"));
     static final File REPO = Utils.join(CWD, Main.REPO_NAME);
     static final String[] fileName = new String[] {
-            CACHE_FOLDER + "/" + LOG_FILE,
             CACHE_FOLDER + "/" + STATUS_FILE,
     };
+
     static final String[] directoryName = new String[] {
             BLOB_FOLDER,
             BRANCH_FOLDER,
@@ -59,6 +58,7 @@ public class Helper {
             }
             log.trace("%s", flag);
         }
+        log.trace("finish file and folder create");
         assert flag;
 
         // add branch
@@ -71,30 +71,15 @@ public class Helper {
         StatusController sc = new StatusController();
         saveStatus(sc);
 
-        log.debug("the init repository has %s", flag? "complete": "failure");
+        log.trace("the init repository has %s", flag? "complete": "failure");
     }
 
     public static void addContentIntoLog(String message) {
-        log.info("addContentIntoLog");
-        File logFile = Utils.join(REPO, CACHE_FOLDER, LOG_FILE);
-        assert logFile.exists();
-        // append the message at the top of the file
-        try {
-            BufferedInputStream in = new BufferedInputStream(new FileInputStream(logFile));
-            byte[] buffer = in.readAllBytes();  // read all byte from file
-            byte[] append = message.getBytes(StandardCharsets.UTF_8);
-            in.close();
-            BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(logFile.toPath()));
-            out.write(append);
-            if (buffer.length != 0)
-                out.write(buffer);
-            out.close();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-//        Utils.writeContents(logFile, message);
+        File branchFile = Utils.join(REPO, CACHE_FOLDER, HEAD_FILE);
+        log.trace(branchFile);
+        Branch branch = Utils.readObject(branchFile, Branch.class);
+        branch.appendLogInBegin(message);
+        Helper.saveContentInFile(branchFile, branch);
     }
 
 

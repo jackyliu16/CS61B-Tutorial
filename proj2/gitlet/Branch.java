@@ -17,15 +17,19 @@ public class Branch implements Serializable {
     static final String DEFAULT_REPO_NAME = "master";
     String name;
     Commit commit;
+    StringBuilder logInfo;
 
     public Branch() {
         this.name = DEFAULT_REPO_NAME;
-        this.commit = new Commit(true);
+        this.commit = new Commit(false);    // BC the commit will getCurrent
+        this.logInfo = new StringBuilder();
+        logInfo.insert(0, commit.toString());
     }
 
-    public Branch(String name, Commit commit) {
+    public Branch(String name, Commit commit, StringBuilder sb) {
         this.name = name;
         this.commit = commit;
+        this.logInfo = sb;
     }
 
     public String getName() {
@@ -61,12 +65,22 @@ public class Branch implements Serializable {
     }
 
     public void baseOnItCreateANewBranch(String branchName) {
-        // create a branch
-        Branch newBranch = new Branch(branchName, this.commit);
-        File branchFile = Utils.join(REPO, BRANCH_FOLDER, branchName);
-        log.debug(newBranch);
-        log.debug(branchFile);
-        // save the branch
-        Helper.saveContentInFile(branchFile, newBranch);
+        File branchFile = Utils.join(REPO, CACHE_FOLDER, HEAD_FILE);
+        Branch current = Utils.readObject(branchFile, Branch.class);
+        Branch newBranch = new Branch(branchName, current.getLatestCommit(), current.getLogInfo());
+        File save = Utils.join(REPO, BRANCH_FOLDER, branchName);
+        Helper.saveContentInFile(save, newBranch);
+    }
+
+    public void appendLogInBegin(String message) {
+        logInfo.insert(0, message);
+    }
+
+    public StringBuilder getLogInfo() {
+        return logInfo;
+    }
+
+    public void printLog() {
+        System.out.println(logInfo);
     }
 }

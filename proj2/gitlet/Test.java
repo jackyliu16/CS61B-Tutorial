@@ -9,13 +9,6 @@ package gitlet;
  */
 
 import java.io.*;
-import java.nio.file.Files;
-import java.sql.SQLOutput;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.regex.*;
-
-import static gitlet.Helper.*;
 
 public class Test {
     static final Logger log = Logger.INSTANCE;
@@ -24,15 +17,41 @@ public class Test {
     static final File TEST_FOLDER = Utils.join(CWD, "test");
     public static void main(String[] args) throws IOException {
         log.setLogLevel(LogLevel.Trace);
+        Branch branch = new Branch();
+        System.out.println(branch);
+//        if (!file.exists()) {
+//            file.createNewFile();
+//        }
+//        LogTest logTest = Utils.readObject(file, LogTest.class);
+//        System.out.println(logTest.toString());
+////        LogTest logTest = new LogTest("logFile");
 //
-//        File file = Utils.join(REPO, BRANCH_FOLDER, "newBranch");
-////        System.out.println(Utils.readObject(file, Branch.class));
-//        Branch branch = Utils.readObject(file, Branch.class);
-//        System.out.println(branch);
-//        System.out.println(file);
-        File file = Utils.join(CWD, "a.txt");
-        assert file.exists();
-        file.delete();
+//        logTest.appendLog(
+//                """
+//                ===
+//                LOG MESSAGE
+//                initial commit
+//
+//                """);
+//        Utils.writeObject(file, logTest);
+    }
+}
+
+class LogTest implements Serializable {
+    String name;
+    StringBuilder sb;
+
+    LogTest(String name) {
+        this.name = name;
+        this.sb = new StringBuilder();
+    }
+
+    void appendLog(String message) {
+        sb.insert(0, message);
+    }
+
+    public String toString() {
+        return sb.toString();
     }
 }
 
